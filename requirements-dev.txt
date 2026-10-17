@@ -1,0 +1,3 @@
+# Everything the app needs, plus tools for development
+-r backend/requirements.txt
+pytest>=8.0
