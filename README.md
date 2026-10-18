@@ -45,6 +45,8 @@ pytest -v
 | GET | `/api/topics/{id}` | one topic, or 404 |
 | GET | `/api/topics/{id}/lessons` | the topic's lessons in order, or 404 |
 | GET | `/api/lessons/{id}` | one lesson with its text from Wikipedia; 404 if unknown, 502 if Wikipedia is unreachable |
+| GET | `/api/lessons/{id}/quiz` | the lesson's quiz questions, without the answers |
+| POST | `/api/lessons/{id}/quiz` | body `{"answers": [1, 0, 2]}`; returns score, pass/fail and explanations |
 
 ## Project structure
 
@@ -52,6 +54,7 @@ pytest -v
 backend/
   main.py            # FastAPI app: API routes + serves the frontend
   wikipedia.py       # Wikipedia API client (with cache)
+  quizzes.py         # quiz questions and answers
   requirements.txt
 frontend/
   index.html         # home page: list of topics
@@ -60,6 +63,7 @@ frontend/
   topic.js           # loads one topic and its lessons
   lesson.html        # lesson page: text from Wikipedia
   lesson.js          # loads one lesson
+  quiz.js            # quiz: load questions, send answers, show the grade
   style.css
 tests/
   test_api.py        # API tests (pytest + FastAPI TestClient)

@@ -129,3 +129,72 @@ h1 {
 .source a {
   color: var(--primary);
 }
+
+.quiz-section {
+  margin-top: 32px;
+}
+
+.button {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+#quiz-form {
+  display: grid;
+  gap: 12px;
+}
+
+.question {
+  margin: 0;
+}
+
+.question legend {
+  font-weight: 600;
+  padding: 0 4px;
+}
+
+.option {
+  display: block;
+  padding: 8px 10px;
+  margin: 6px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.option.right {
+  border-color: var(--primary);
+  background: #c8e6c9;
+}
+
+.option.wrong {
+  border-color: #c62828;
+  background: #ffcdd2;
+}
+
+.explanation {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.quiz-result {
+  margin-top: 12px;
+}
+
+.quiz-result h3 {
+  margin-top: 0;
+}
+
+.quiz-result.passed {
+  border-color: var(--primary);
+}

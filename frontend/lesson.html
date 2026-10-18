@@ -18,8 +18,18 @@
     <main>
       <article id="lesson-body" class="card lesson-body"></article>
       <p id="lesson-source" class="source"></p>
+
+      <section id="quiz-section" class="quiz-section" hidden>
+        <h2>Quiz</h2>
+        <button id="start-quiz" class="button">Start quiz</button>
+        <!-- quiz.js builds the questions inside this form -->
+        <form id="quiz-form" hidden></form>
+        <div id="quiz-result" class="card quiz-result" hidden></div>
+      </section>
     </main>
 
+    <!-- quiz.js first: lesson.js calls setUpQuiz(), defined in quiz.js -->
+    <script src="quiz.js"></script>
     <script src="lesson.js"></script>
   </body>
 </html>

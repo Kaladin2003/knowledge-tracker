@@ -9,6 +9,7 @@ async function loadLessonPage() {
     title.textContent = "No lesson selected";
     return;
   }
+  setUpQuiz(lessonId); // defined in quiz.js; the quiz works even if Wikipedia is down
 
   try {
     const response = await fetch(`/api/lessons/${encodeURIComponent(lessonId)}`);

@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 import backend.main
 from backend.main import LESSONS, TOPICS, app
+from backend.quizzes import QUIZZES
 from backend.wikipedia import ArticleNotFound, WikipediaError
 
 client = TestClient(app)
@@ -157,3 +158,75 @@ def test_lesson_page_is_served():
     response = client.get("/lesson.html")
 
     assert response.status_code == 200
+
+
+# --- Quiz (Step 5) ---
+
+
+def test_quiz_questions_hide_the_answers():
+    response = client.get("/api/lessons/bikes-frame/quiz")
+
+    assert response.status_code == 200
+    questions = response.json()
+    assert len(questions) == 3
+    for question in questions:
+        assert set(question) == {"question", "options"}  # no "answer", no "explanation"
+
+
+def test_quiz_all_correct_passes():
+    correct = [q["answer"] for q in QUIZZES["bikes-frame"]]
+
+    response = client.post("/api/lessons/bikes-frame/quiz", json={"answers": correct})
+
+    assert response.status_code == 200
+    grade = response.json()
+    assert grade["score"] == 3
+    assert grade["passed"] is True
+    assert all(result["correct"] for result in grade["results"])
+
+
+def test_quiz_two_correct_still_passes():
+    answers = [q["answer"] for q in QUIZZES["bikes-frame"]]
+    answers[0] = (answers[0] + 1) % 3  # make the first answer wrong
+
+    grade = client.post("/api/lessons/bikes-frame/quiz", json={"answers": answers}).json()
+
+    assert grade["score"] == 2
+    assert grade["passed"] is True
+    assert grade["results"][0]["correct"] is False
+
+
+def test_quiz_one_correct_fails():
+    answers = [(q["answer"] + 1) % 3 for q in QUIZZES["bikes-frame"]]
+    answers[0] = QUIZZES["bikes-frame"][0]["answer"]
+
+    grade = client.post("/api/lessons/bikes-frame/quiz", json={"answers": answers}).json()
+
+    assert grade["score"] == 1
+    assert grade["passed"] is False
+
+
+def test_quiz_wrong_number_of_answers_returns_400():
+    response = client.post("/api/lessons/bikes-frame/quiz", json={"answers": [0]})
+
+    assert response.status_code == 400
+
+
+def test_quiz_invalid_body_returns_422():
+    # Pydantic rejects data that does not match QuizAnswers
+    response = client.post("/api/lessons/bikes-frame/quiz", json={"answers": "abc"})
+
+    assert response.status_code == 422
+
+
+def test_quiz_of_unknown_lesson_returns_404():
+    assert client.get("/api/lessons/does-not-exist/quiz").status_code == 404
+
+
+def test_every_lesson_has_a_valid_quiz():
+    for lesson in LESSONS:
+        quiz = QUIZZES[lesson["id"]]
+        assert len(quiz) == 3, lesson["id"]
+        for question in quiz:
+            assert 0 <= question["answer"] < len(question["options"]), question["question"]
+            assert len(set(question["options"])) == len(question["options"]), question["question"]

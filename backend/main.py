@@ -12,10 +12,14 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
+from backend.quizzes import QUIZZES
 from backend.wikipedia import ArticleNotFound, WikipediaError, fetch_summary
 
-app = FastAPI(title="Knowledge Garden API", version="0.3.0")
+app = FastAPI(title="Knowledge Garden API", version="0.4.0")
+
+PASS_SCORE = 2  # correct answers needed to pass a 3-question quiz
 
 # Hardcoded data for now. A later step moves this into a database.
 TOPICS = [
@@ -101,6 +105,58 @@ def get_lesson(lesson_id: str):
             "url": content["url"],
             "license": "CC BY-SA 4.0",
         },
+    }
+
+
+def find_quiz(lesson_id: str) -> list[dict]:
+    """Return the quiz of a lesson, or stop the request with a 404."""
+    find_lesson(lesson_id)  # 404 if the lesson does not exist
+    quiz = QUIZZES.get(lesson_id)
+    if quiz is None:
+        raise HTTPException(status_code=404, detail="This lesson has no quiz yet")
+    return quiz
+
+
+@app.get("/api/lessons/{lesson_id}/quiz")
+def get_quiz(lesson_id: str):
+    """The questions and options, WITHOUT the correct answers."""
+    quiz = find_quiz(lesson_id)
+    return [{"question": q["question"], "options": q["options"]} for q in quiz]
+
+
+class QuizAnswers(BaseModel):
+    """What the browser sends: the index of the chosen option for each question."""
+
+    answers: list[int]
+
+
+@app.post("/api/lessons/{lesson_id}/quiz")
+def check_quiz(lesson_id: str, submission: QuizAnswers):
+    """Grade the answers. Only now does the browser learn the correct ones."""
+    quiz = find_quiz(lesson_id)
+    if len(submission.answers) != len(quiz):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Expected {len(quiz)} answers, got {len(submission.answers)}",
+        )
+
+    results = []
+    for question, chosen in zip(quiz, submission.answers):
+        results.append(
+            {
+                "chosen": chosen,
+                "correct_answer": question["answer"],
+                "correct": chosen == question["answer"],
+                "explanation": question["explanation"],
+            }
+        )
+
+    score = sum(result["correct"] for result in results)
+    return {
+        "score": score,
+        "total": len(quiz),
+        "passed": score >= PASS_SCORE,
+        "results": results,
     }
 
 
