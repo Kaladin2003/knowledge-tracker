@@ -9,6 +9,7 @@ I build it in small steps, one commit at a time, and write down what I learn in 
 
 - **Backend:** Python + [FastAPI](https://fastapi.tiangolo.com)
 - **Frontend:** plain HTML, CSS and JavaScript
+- **Lesson text:** [Wikipedia REST API](https://en.wikipedia.org/api/rest_v1/) (page summaries)
 - **Tests:** pytest
 
 ## Run it locally
@@ -43,23 +44,32 @@ pytest -v
 | GET | `/api/topics` | all topics |
 | GET | `/api/topics/{id}` | one topic, or 404 |
 | GET | `/api/topics/{id}/lessons` | the topic's lessons in order, or 404 |
+| GET | `/api/lessons/{id}` | one lesson with its text from Wikipedia; 404 if unknown, 502 if Wikipedia is unreachable |
 
 ## Project structure
 
 ```text
 backend/
   main.py            # FastAPI app: API routes + serves the frontend
+  wikipedia.py       # Wikipedia API client (with cache)
   requirements.txt
 frontend/
   index.html         # home page: list of topics
   app.js             # loads the topics
   topic.html         # topic page: list of lessons
   topic.js           # loads one topic and its lessons
+  lesson.html        # lesson page: text from Wikipedia
+  lesson.js          # loads one lesson
   style.css
 tests/
   test_api.py        # API tests (pytest + FastAPI TestClient)
+  test_wikipedia.py  # Wikipedia client tests (no real network calls)
 docs/steps/          # what each step taught me
 ```
+
+## Credits
+
+Lesson text comes from [Wikipedia](https://www.wikipedia.org), licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Each lesson page links to its source article.
 
 ## Steps
 

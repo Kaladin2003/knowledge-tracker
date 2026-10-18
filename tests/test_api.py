@@ -6,7 +6,9 @@ no server has to run, and no real network is used.
 
 from fastapi.testclient import TestClient
 
+import backend.main
 from backend.main import LESSONS, TOPICS, app
+from backend.wikipedia import ArticleNotFound, WikipediaError
 
 client = TestClient(app)
 
@@ -95,3 +97,63 @@ def test_topic_page_is_served():
 
     assert response.status_code == 200
     assert "Lessons" in response.text
+
+
+# --- Lesson page with Wikipedia content (Step 4) ---
+# monkeypatch replaces backend.main.fetch_summary, so these tests never call Wikipedia.
+
+FAKE_CONTENT = {
+    "title": "Bicycle frame",
+    "extract": "A bicycle frame is the main component of a bicycle.",
+    "image": None,
+    "url": "https://en.wikipedia.org/wiki/Bicycle_frame",
+}
+
+
+def test_get_lesson_with_wikipedia_content(monkeypatch):
+    monkeypatch.setattr(backend.main, "fetch_summary", lambda title: FAKE_CONTENT)
+
+    response = client.get("/api/lessons/bikes-frame")
+
+    assert response.status_code == 200
+    lesson = response.json()
+    assert lesson["title"] == "The frame: the bike's skeleton"
+    assert lesson["content"]["extract"].startswith("A bicycle frame")
+    assert lesson["source"]["url"] == FAKE_CONTENT["url"]
+
+
+def test_unknown_lesson_returns_404():
+    response = client.get("/api/lessons/does-not-exist")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Lesson not found"}
+
+
+def test_missing_wikipedia_article_returns_404(monkeypatch):
+    def not_found(title):
+        raise ArticleNotFound("No Wikipedia article called 'x'")
+
+    monkeypatch.setattr(backend.main, "fetch_summary", not_found)
+
+    assert client.get("/api/lessons/bikes-frame").status_code == 404
+
+
+def test_wikipedia_down_returns_502(monkeypatch):
+    def down(title):
+        raise WikipediaError("Could not reach Wikipedia")
+
+    monkeypatch.setattr(backend.main, "fetch_summary", down)
+
+    response = client.get("/api/lessons/bikes-frame")
+    assert response.status_code == 502
+
+
+def test_every_lesson_has_a_wikipedia_title():
+    for lesson in LESSONS:
+        assert lesson["wiki_title"], lesson["id"]
+
+
+def test_lesson_page_is_served():
+    response = client.get("/lesson.html")
+
+    assert response.status_code == 200

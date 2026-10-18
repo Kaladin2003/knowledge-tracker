@@ -44,9 +44,13 @@ async function loadTopicPage() {
   }
 }
 
+// One clickable lesson card. Links to lesson.html?id=bikes-frame
 function lessonItem(lesson) {
   const item = document.createElement("li");
-  item.className = "card lesson";
+
+  const link = document.createElement("a");
+  link.className = "card lesson";
+  link.href = `lesson.html?id=${encodeURIComponent(lesson.id)}`;
 
   const name = document.createElement("h3");
   name.textContent = lesson.title;
@@ -54,7 +58,8 @@ function lessonItem(lesson) {
   const minutes = document.createElement("p");
   minutes.textContent = `Lesson ${lesson.order} · ${lesson.minutes} min`;
 
-  item.append(name, minutes);
+  link.append(name, minutes);
+  item.appendChild(link);
   return item;
 }
 

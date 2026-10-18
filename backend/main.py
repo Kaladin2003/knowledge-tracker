@@ -13,7 +13,9 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 
-app = FastAPI(title="Knowledge Garden API", version="0.2.0")
+from backend.wikipedia import ArticleNotFound, WikipediaError, fetch_summary
+
+app = FastAPI(title="Knowledge Garden API", version="0.3.0")
 
 # Hardcoded data for now. A later step moves this into a database.
 TOPICS = [
@@ -23,13 +25,14 @@ TOPICS = [
 
 # Each lesson points to its topic with "topic_id".
 # In a database this is called a foreign key: lessons.topic_id -> topics.id
+# "wiki_title" is the Wikipedia article the lesson text comes from.
 LESSONS = [
-    {"id": "bikes-frame", "topic_id": "bikes", "order": 1, "title": "The frame: the bike's skeleton", "minutes": 3},
-    {"id": "bikes-drivetrain", "topic_id": "bikes", "order": 2, "title": "The drivetrain: from your legs to the wheel", "minutes": 4},
-    {"id": "bikes-brakes", "topic_id": "bikes", "order": 3, "title": "Brakes: rim vs disc", "minutes": 3},
-    {"id": "space-solar-system", "topic_id": "space", "order": 1, "title": "The Solar System at a glance", "minutes": 3},
-    {"id": "space-moon-phases", "topic_id": "space", "order": 2, "title": "Why the Moon has phases", "minutes": 3},
-    {"id": "space-light-year", "topic_id": "space", "order": 3, "title": "What is a light-year?", "minutes": 3},
+    {"id": "bikes-frame", "topic_id": "bikes", "order": 1, "title": "The frame: the bike's skeleton", "minutes": 3, "wiki_title": "Bicycle frame"},
+    {"id": "bikes-drivetrain", "topic_id": "bikes", "order": 2, "title": "The drivetrain: from your legs to the wheel", "minutes": 4, "wiki_title": "Bicycle drivetrain systems"},
+    {"id": "bikes-brakes", "topic_id": "bikes", "order": 3, "title": "Brakes: rim vs disc", "minutes": 3, "wiki_title": "Bicycle brake"},
+    {"id": "space-solar-system", "topic_id": "space", "order": 1, "title": "The Solar System at a glance", "minutes": 3, "wiki_title": "Solar System"},
+    {"id": "space-moon-phases", "topic_id": "space", "order": 2, "title": "Why the Moon has phases", "minutes": 3, "wiki_title": "Lunar phase"},
+    {"id": "space-light-year", "topic_id": "space", "order": 3, "title": "What is a light-year?", "minutes": 3, "wiki_title": "Light-year"},
 ]
 
 
@@ -65,6 +68,40 @@ def list_lessons(topic_id: str):
     find_topic(topic_id)  # raises 404 for an unknown topic
     lessons = [lesson for lesson in LESSONS if lesson["topic_id"] == topic_id]
     return sorted(lessons, key=lambda lesson: lesson["order"])
+
+
+def find_lesson(lesson_id: str) -> dict:
+    """Return the lesson with this id, or stop the request with a 404."""
+    for lesson in LESSONS:
+        if lesson["id"] == lesson_id:
+            return lesson
+    raise HTTPException(status_code=404, detail="Lesson not found")
+
+
+@app.get("/api/lessons/{lesson_id}")
+def get_lesson(lesson_id: str):
+    """One lesson with its text, loaded from Wikipedia.
+
+    404: unknown lesson id, or the Wikipedia article does not exist.
+    502: Wikipedia could not be reached ("Bad Gateway": a server we depend on failed).
+    """
+    lesson = find_lesson(lesson_id)
+    try:
+        content = fetch_summary(lesson["wiki_title"])
+    except ArticleNotFound as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
+    except WikipediaError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
+
+    return {
+        **lesson,
+        "content": content,
+        "source": {
+            "name": "Wikipedia",
+            "url": content["url"],
+            "license": "CC BY-SA 4.0",
+        },
+    }
 
 
 # Serve the web page. This line must come AFTER the API routes:
