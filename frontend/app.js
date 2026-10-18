@@ -1,4 +1,4 @@
-// Runs in the browser. Asks the backend for the topics and shows them.
+// Home page: asks the backend for the topics and shows them as links.
 
 async function loadTopics() {
   const list = document.getElementById("topics");
@@ -11,21 +11,45 @@ async function loadTopics() {
     }
     const topics = await response.json();
 
-    list.innerHTML = "";
+    list.replaceChildren(); // remove "Loading…"
     for (const topic of topics) {
-      const item = document.createElement("li");
-      item.className = "topic";
-      item.innerHTML = `
-        <span class="emoji">${topic.emoji}</span>
-        <div>
-          <h3>${topic.title}</h3>
-          <p>${topic.description}</p>
-        </div>`;
-      list.appendChild(item);
+      list.appendChild(topicCard(topic));
     }
   } catch (error) {
-    list.innerHTML = `<li class="error">Could not load topics: ${error.message}. Is the backend running?</li>`;
+    list.replaceChildren(message(`Could not load topics: ${error.message}. Is the backend running?`, "error"));
   }
+}
+
+// One clickable card. It links to the topic page with the topic id in the URL:
+// topic.html?id=bikes
+function topicCard(topic) {
+  const item = document.createElement("li");
+
+  const link = document.createElement("a");
+  link.className = "card topic";
+  link.href = `topic.html?id=${encodeURIComponent(topic.id)}`;
+
+  const emoji = document.createElement("span");
+  emoji.className = "emoji";
+  emoji.textContent = topic.emoji;
+
+  const text = document.createElement("div");
+  const title = document.createElement("h3");
+  title.textContent = topic.title;
+  const description = document.createElement("p");
+  description.textContent = topic.description;
+  text.append(title, description);
+
+  link.append(emoji, text);
+  item.appendChild(link);
+  return item;
+}
+
+function message(text, className) {
+  const item = document.createElement("li");
+  item.className = className;
+  item.textContent = text;
+  return item;
 }
 
 loadTopics();

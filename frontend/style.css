@@ -35,21 +35,45 @@ h1 {
   color: var(--muted);
 }
 
-.topics {
+.topics,
+.lessons {
   list-style: none;
   padding: 0;
   display: grid;
   gap: 12px;
 }
 
-.topic {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px;
+}
+
+.topic {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.topic:hover {
+  border-color: var(--primary);
+}
+
+.lesson h3 {
+  margin: 0;
+}
+
+.lesson p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.back {
+  color: var(--primary);
+  text-decoration: none;
 }
 
 .topic .emoji {
