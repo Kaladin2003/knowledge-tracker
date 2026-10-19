@@ -13,11 +13,12 @@ import sqlite3
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from backend.db import DB_PATH, connect, get_db, init_db
+from backend.garden import get_garden
 from backend import streak
 from backend.progress import get_completion, get_progress, record_completion, record_pass, reset_progress
 from backend.wikipedia import ArticleNotFound, WikipediaError, fetch_summary
@@ -34,7 +35,20 @@ async def lifespan(app: FastAPI):
     yield  # the server runs here
 
 
-app = FastAPI(title="Knowledge Garden API", version="0.7.0", lifespan=lifespan)
+app = FastAPI(title="Knowledge Garden API", version="0.8.0", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def no_cache_for_pages(request: Request, call_next):
+    """Middleware: runs around EVERY request.
+
+    For the page files (HTML, CSS, JS) it adds a header that tells the browser:
+    "you may keep a copy, but ask me first if it changed". No more stale files after an update.
+    """
+    response = await call_next(request)  # let the app handle the request first
+    if not request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
 
 
 def find_topic(db: sqlite3.Connection, topic_id: str) -> dict:
@@ -195,6 +209,12 @@ def check_quiz(lesson_id: str, submission: QuizAnswers, db: sqlite3.Connection =
 def read_progress(db: sqlite3.Connection = Depends(get_db)):
     """Finished lessons, newest first, with totals."""
     return get_progress(db)
+
+
+@app.get("/api/garden")
+def read_garden(db: sqlite3.Connection = Depends(get_db)):
+    """One tree per finished lesson, oldest first, plus the garden size."""
+    return get_garden(db)
 
 
 @app.get("/api/streak")

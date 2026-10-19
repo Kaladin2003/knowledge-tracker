@@ -256,3 +256,66 @@ h1 {
 .streak-today.done {
   color: var(--primary);
 }
+
+.garden-card {
+  margin-bottom: 12px;
+  background: #2f6b4a;
+  border-color: #2f6b4a;
+  color: #ffffff;
+}
+
+.garden-card h2 {
+  margin: 0 0 4px;
+}
+
+#garden-status {
+  color: #d7e8dc;
+  margin: 0;
+}
+
+.garden-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tree {
+  cursor: pointer;
+}
+
+.tree:focus {
+  outline: none; /* the glow below shows focus instead of a box */
+}
+
+.tree:hover,
+.tree:focus-visible {
+  filter: brightness(1.15);
+}
+
+.tree.selected {
+  filter: drop-shadow(0 0 6px #fff59d);
+}
+
+.tree-info {
+  background: #ffffff;
+  color: var(--text);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.tree-info h3 {
+  margin: 0 0 6px;
+}
+
+.tree-info p {
+  margin: 4px 0;
+}
+
+.tree-info .muted {
+  color: var(--muted);
+}
+
+.tree-info a {
+  color: var(--primary);
+  font-weight: 600;
+}

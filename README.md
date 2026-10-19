@@ -1,6 +1,6 @@
 # Knowledge Garden
 
-A daily learning app: pick a topic, read a short lesson, pass a quiz, keep your streak, and grow a knowledge tree.
+A daily learning app: pick a topic, read a short lesson, pass a quiz, keep your streak, and grow a **knowledge garden**: every finished lesson plants a tree.
 
 **Plan:** build it as a web app first (running on localhost), then turn it into a mobile app.
 I build it in small steps, one commit at a time, and write down what I learn in [`docs/steps`](docs/steps).
@@ -52,6 +52,7 @@ pytest -v
 | GET | `/api/lessons/{id}/quiz` | the lesson's quiz questions, without the answers |
 | POST | `/api/lessons/{id}/quiz` | body `{"answers": [1, 0, 2]}`; returns score, pass/fail and explanations; a pass is saved |
 | GET | `/api/progress` | finished lessons and totals |
+| GET | `/api/garden` | one tree per finished lesson (why it was planted), plus the garden size |
 | GET | `/api/streak?tz=Europe/Athens` | daily streak (current, best, learned today) in the user's time zone |
 | DELETE | `/api/progress` | forget all progress and streak history (204) |
 
@@ -61,6 +62,7 @@ pytest -v
 backend/
   main.py            # FastAPI app: API routes + serves the frontend
   db.py              # SQLite: connect, create tables, seed, get_db
+  garden.py          # the knowledge garden: one tree per finished lesson
   progress.py        # save and read finished lessons, log passes
   streak.py          # daily streak calculation (time-zone aware)
   schema.sql         # database tables
@@ -75,6 +77,7 @@ frontend/
   lesson.html        # lesson page: text from Wikipedia
   lesson.js          # loads one lesson
   quiz.js            # quiz: load questions, send answers, show the grade
+  garden.js          # draws the isometric garden (SVG); click a tree to see why it was planted
   style.css
 tests/
   test_api.py        # API tests (pytest + FastAPI TestClient)
@@ -82,6 +85,7 @@ tests/
   test_db.py         # database tests
   test_progress.py   # saving progress
   test_streak.py     # streak logic, time zones, fake clock
+  test_garden.py     # garden and caching
   test_wikipedia.py  # Wikipedia client tests (no real network calls)
 docs/steps/          # what each step taught me
 ```

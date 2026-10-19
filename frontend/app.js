@@ -107,8 +107,8 @@ async function resetProgress() {
   if (response.ok) {
     loadTopics();
     loadProgressSummary();
-loadStreak();
     loadStreak();
+    loadGarden(); // defined in garden.js
   }
 }
 

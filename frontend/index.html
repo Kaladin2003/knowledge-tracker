@@ -23,6 +23,14 @@
         </div>
       </section>
 
+      <!-- garden.js draws the garden here -->
+      <section class="card garden-card">
+        <h2>Your garden</h2>
+        <p id="garden-status" class="muted">Loading…</p>
+        <div id="garden" class="garden"></div>
+        <div id="tree-info" class="tree-info" hidden></div>
+      </section>
+
       <!-- app.js fills this with "You finished X of Y lessons" -->
       <p id="progress-summary" class="card progress-summary" hidden></p>
 
@@ -36,5 +44,6 @@
     </main>
 
     <script src="app.js"></script>
+    <script src="garden.js"></script>
   </body>
 </html>

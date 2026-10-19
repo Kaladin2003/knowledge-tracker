@@ -13,7 +13,7 @@ One step = one commit (or a few small ones). Each step has notes in `docs/steps/
 - [x] **Step 6:** Database: move topics and lessons into SQLite.
 - [x] **Step 7:** Save progress: a passed quiz is saved in the database; `GET`/`DELETE /api/progress`.
 - [x] **Step 8:** Daily streak logic on the backend, with tests.
-- [ ] **Step 9:** Knowledge tree drawn with SVG.
+- [x] **Step 9:** Knowledge garden: one SVG tree per finished lesson, click a tree to see why it was planted.
 - [ ] **Step 10:** Users: sign up and log in.
 
 ## Phase 2: smarter lessons
