@@ -31,7 +31,7 @@ def test_list_topics_returns_all_topics(client):
     assert len(topics) >= 2
     # Every topic has the fields the web page needs
     for topic in topics:
-        assert set(topic) == {"id", "title", "emoji", "description"}
+        assert set(topic) == {"id", "title", "emoji", "description", "lesson_count", "completed_count"}
 
 
 def test_get_one_topic(client):

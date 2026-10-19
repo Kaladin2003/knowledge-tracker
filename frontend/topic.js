@@ -57,6 +57,10 @@ function lessonItem(lesson) {
 
   const minutes = document.createElement("p");
   minutes.textContent = `Lesson ${lesson.position} · ${lesson.minutes} min`;
+  if (lesson.completed) {
+    link.classList.add("completed");
+    minutes.textContent += ` · ✅ Done (best ${lesson.best_score}/3)`;
+  }
 
   link.append(name, minutes);
   item.appendChild(link);

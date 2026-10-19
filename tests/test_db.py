@@ -71,3 +71,8 @@ def test_query_parameters_block_sql_injection(client):
     response = client.get("/api/topics/x' OR '1'='1")
 
     assert response.status_code == 404
+
+
+def test_completion_of_unknown_lesson_is_blocked(db):
+    with pytest.raises(sqlite3.IntegrityError):
+        db.execute("INSERT INTO completions (lesson_id, completed_at, best_score) VALUES ('nope', '2026-01-01', 3)")

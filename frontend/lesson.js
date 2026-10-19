@@ -23,6 +23,9 @@ async function loadLessonPage() {
     document.title = `${lesson.title} · Knowledge Garden`;
     title.textContent = lesson.title;
     meta.textContent = `Lesson ${lesson.position} · ${lesson.minutes} min`;
+    if (lesson.completion) {
+      meta.textContent += ` · ✅ Done (best score ${lesson.completion.best_score}/3)`;
+    }
     document.getElementById("back").href = `topic.html?id=${encodeURIComponent(lesson.topic_id)}`;
 
     showBody(lesson.content);

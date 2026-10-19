@@ -14,11 +14,16 @@
     </header>
 
     <main>
+      <!-- app.js fills this with "You finished X of Y lessons" -->
+      <p id="progress-summary" class="card progress-summary" hidden></p>
+
       <h2>Topics</h2>
       <!-- app.js fills this list with data from the API -->
       <ul id="topics" class="topics">
         <li class="muted">Loading…</li>
       </ul>
+
+      <button id="reset-progress" class="link-button">Reset progress</button>
     </main>
 
     <script src="app.js"></script>

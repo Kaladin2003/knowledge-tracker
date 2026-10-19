@@ -27,3 +27,11 @@ CREATE TABLE IF NOT EXISTS questions (
     explanation TEXT NOT NULL,
     UNIQUE (lesson_id, position)
 );
+
+-- Step 7: which lessons the user has finished (one row per finished lesson).
+-- No users yet, so this is the progress of the one person using the app.
+CREATE TABLE IF NOT EXISTS completions (
+    lesson_id    TEXT PRIMARY KEY REFERENCES lessons(id),  -- each lesson at most once
+    completed_at TEXT NOT NULL,                            -- first time passed, UTC, ISO 8601: "2026-10-19T10:15:00+00:00"
+    best_score   INTEGER NOT NULL                          -- best quiz score so far
+);

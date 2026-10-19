@@ -198,3 +198,33 @@ h1 {
 .quiz-result.passed {
   border-color: var(--primary);
 }
+
+.progress-summary {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.topic .count {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.topic .count.done {
+  color: var(--primary);
+}
+
+.lesson.completed {
+  border-left: 4px solid var(--primary);
+}
+
+.link-button {
+  display: block;
+  margin: 24px auto 0;
+  background: none;
+  border: none;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+}

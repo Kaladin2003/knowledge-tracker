@@ -125,9 +125,9 @@ function showResults(fieldsets, grade) {
   const heading = document.createElement("h3");
   heading.textContent = `${grade.score}/${grade.total} correct`;
   const message = document.createElement("p");
-  message.textContent = grade.passed
-    ? "🌱 Lesson complete! Well done."
-    : "📖 Not yet. Read the lesson again and retry.";
+  message.textContent = grade.saved
+    ? "🌱 Lesson complete! Saved to your progress."
+    : `📖 Not yet: you need 2 correct answers. Read the lesson again and retry.`;
   const retry = document.createElement("button");
   retry.className = "button";
   retry.textContent = "Try again";

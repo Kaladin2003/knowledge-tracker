@@ -45,12 +45,14 @@ pytest -v
 | Method | Path | Returns |
 |---|---|---|
 | GET | `/api/health` | `{"status": "ok"}` |
-| GET | `/api/topics` | all topics |
+| GET | `/api/topics` | all topics, with lesson and finished counts |
 | GET | `/api/topics/{id}` | one topic, or 404 |
-| GET | `/api/topics/{id}/lessons` | the topic's lessons in order, or 404 |
+| GET | `/api/topics/{id}/lessons` | the topic's lessons in order (with `completed`), or 404 |
 | GET | `/api/lessons/{id}` | one lesson with its text from Wikipedia; 404 if unknown, 502 if Wikipedia is unreachable |
 | GET | `/api/lessons/{id}/quiz` | the lesson's quiz questions, without the answers |
-| POST | `/api/lessons/{id}/quiz` | body `{"answers": [1, 0, 2]}`; returns score, pass/fail and explanations |
+| POST | `/api/lessons/{id}/quiz` | body `{"answers": [1, 0, 2]}`; returns score, pass/fail and explanations; a pass is saved |
+| GET | `/api/progress` | finished lessons and totals |
+| DELETE | `/api/progress` | forget all progress (204) |
 
 ## Project structure
 
@@ -58,6 +60,7 @@ pytest -v
 backend/
   main.py            # FastAPI app: API routes + serves the frontend
   db.py              # SQLite: connect, create tables, seed, get_db
+  progress.py        # save and read finished lessons
   schema.sql         # database tables
   seed_data.py       # starting topics, lessons and quiz questions
   wikipedia.py       # Wikipedia API client (with cache)
@@ -75,6 +78,7 @@ tests/
   test_api.py        # API tests (pytest + FastAPI TestClient)
   conftest.py        # fixtures: a fresh test database for every test
   test_db.py         # database tests
+  test_progress.py   # saving progress
   test_wikipedia.py  # Wikipedia client tests (no real network calls)
 docs/steps/          # what each step taught me
 ```

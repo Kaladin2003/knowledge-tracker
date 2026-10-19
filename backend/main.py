@@ -18,6 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from backend.db import DB_PATH, connect, get_db, init_db
+from backend.progress import get_completion, get_progress, record_completion, reset_progress
 from backend.wikipedia import ArticleNotFound, WikipediaError, fetch_summary
 
 PASS_SCORE = 2  # correct answers needed to pass a 3-question quiz
@@ -32,7 +33,7 @@ async def lifespan(app: FastAPI):
     yield  # the server runs here
 
 
-app = FastAPI(title="Knowledge Garden API", version="0.5.0", lifespan=lifespan)
+app = FastAPI(title="Knowledge Garden API", version="0.6.0", lifespan=lifespan)
 
 
 def find_topic(db: sqlite3.Connection, topic_id: str) -> dict:
@@ -71,8 +72,19 @@ def health():
 
 @app.get("/api/topics")
 def list_topics(db: sqlite3.Connection = Depends(get_db)):
-    """All topics the user can learn."""
-    rows = db.execute("SELECT * FROM topics ORDER BY title").fetchall()
+    """All topics, each with how many lessons it has and how many are finished."""
+    rows = db.execute(
+        """
+        SELECT t.id, t.title, t.emoji, t.description,
+               COUNT(l.id)        AS lesson_count,
+               COUNT(c.lesson_id) AS completed_count
+        FROM topics t
+        LEFT JOIN lessons l     ON l.topic_id = t.id
+        LEFT JOIN completions c ON c.lesson_id = l.id
+        GROUP BY t.id
+        ORDER BY t.title
+        """
+    ).fetchall()
     return [dict(row) for row in rows]
 
 
@@ -87,9 +99,17 @@ def list_lessons(topic_id: str, db: sqlite3.Connection = Depends(get_db)):
     """The lessons of one topic, in learning order. 404 if the topic does not exist."""
     find_topic(db, topic_id)  # raises 404 for an unknown topic
     rows = db.execute(
-        "SELECT * FROM lessons WHERE topic_id = ? ORDER BY position", (topic_id,)
+        """
+        SELECT l.*, c.best_score
+        FROM lessons l
+        LEFT JOIN completions c ON c.lesson_id = l.id
+        WHERE l.topic_id = ?
+        ORDER BY l.position
+        """,
+        (topic_id,),
     ).fetchall()
-    return [dict(row) for row in rows]
+    # best_score is NULL (None) when the lesson was never passed
+    return [{**dict(row), "completed": row["best_score"] is not None} for row in rows]
 
 
 @app.get("/api/lessons/{lesson_id}")
@@ -109,6 +129,7 @@ def get_lesson(lesson_id: str, db: sqlite3.Connection = Depends(get_db)):
 
     return {
         **lesson,
+        "completion": get_completion(db, lesson_id),  # None if not finished yet
         "content": content,
         "source": {
             "name": "Wikipedia",
@@ -153,12 +174,30 @@ def check_quiz(lesson_id: str, submission: QuizAnswers, db: sqlite3.Connection =
         )
 
     score = sum(result["correct"] for result in results)
+    passed = score >= PASS_SCORE
+    if passed:
+        # The server decides and saves. The browser cannot mark a lesson as done by itself.
+        record_completion(db, lesson_id, score)
+
     return {
         "score": score,
         "total": len(quiz),
-        "passed": score >= PASS_SCORE,
+        "passed": passed,
+        "saved": passed,
         "results": results,
     }
+
+
+@app.get("/api/progress")
+def read_progress(db: sqlite3.Connection = Depends(get_db)):
+    """Finished lessons, newest first, with totals."""
+    return get_progress(db)
+
+
+@app.delete("/api/progress", status_code=204)
+def delete_progress(db: sqlite3.Connection = Depends(get_db)):
+    """Forget all progress. 204 No Content: it worked, nothing to send back."""
+    reset_progress(db)
 
 
 # Serve the web page. This line must come AFTER the API routes:
