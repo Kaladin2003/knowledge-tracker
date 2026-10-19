@@ -35,3 +35,11 @@ CREATE TABLE IF NOT EXISTS completions (
     completed_at TEXT NOT NULL,                            -- first time passed, UTC, ISO 8601: "2026-10-19T10:15:00+00:00"
     best_score   INTEGER NOT NULL                          -- best quiz score so far
 );
+
+-- Step 8: a log of every passed quiz (also retakes). The streak is calculated from it.
+-- Times are UTC; the user's "day" is worked out from their time zone when reading.
+CREATE TABLE IF NOT EXISTS quiz_passes (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    lesson_id TEXT NOT NULL REFERENCES lessons(id),
+    passed_at TEXT NOT NULL                 -- UTC, ISO 8601
+);

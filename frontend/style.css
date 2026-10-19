@@ -228,3 +228,31 @@ h1 {
   cursor: pointer;
   font-size: 14px;
 }
+
+.streak {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.streak-number {
+  font-size: 40px;
+  font-weight: 800;
+  color: #ef6c00;
+  white-space: nowrap;
+}
+
+.streak-label {
+  margin: 0;
+  font-weight: 600;
+}
+
+.streak-today {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.streak-today.done {
+  color: var(--primary);
+}

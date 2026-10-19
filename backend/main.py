@@ -18,7 +18,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from backend.db import DB_PATH, connect, get_db, init_db
-from backend.progress import get_completion, get_progress, record_completion, reset_progress
+from backend import streak
+from backend.progress import get_completion, get_progress, record_completion, record_pass, reset_progress
 from backend.wikipedia import ArticleNotFound, WikipediaError, fetch_summary
 
 PASS_SCORE = 2  # correct answers needed to pass a 3-question quiz
@@ -33,7 +34,7 @@ async def lifespan(app: FastAPI):
     yield  # the server runs here
 
 
-app = FastAPI(title="Knowledge Garden API", version="0.6.0", lifespan=lifespan)
+app = FastAPI(title="Knowledge Garden API", version="0.7.0", lifespan=lifespan)
 
 
 def find_topic(db: sqlite3.Connection, topic_id: str) -> dict:
@@ -177,7 +178,9 @@ def check_quiz(lesson_id: str, submission: QuizAnswers, db: sqlite3.Connection =
     passed = score >= PASS_SCORE
     if passed:
         # The server decides and saves. The browser cannot mark a lesson as done by itself.
-        record_completion(db, lesson_id, score)
+        now = streak.utc_now()
+        record_completion(db, lesson_id, score, now)
+        record_pass(db, lesson_id, now)  # every pass counts for the streak
 
     return {
         "score": score,
@@ -192,6 +195,20 @@ def check_quiz(lesson_id: str, submission: QuizAnswers, db: sqlite3.Connection =
 def read_progress(db: sqlite3.Connection = Depends(get_db)):
     """Finished lessons, newest first, with totals."""
     return get_progress(db)
+
+
+@app.get("/api/streak")
+def read_streak(tz: str = "UTC", db: sqlite3.Connection = Depends(get_db)):
+    """The daily streak in the user's time zone.
+
+    tz is a query parameter: /api/streak?tz=Europe/Athens
+    The browser knows its time zone; the server needs it to know when "today" starts.
+    """
+    try:
+        zone = streak.get_timezone(tz)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    return streak.get_streak(db, zone)
 
 
 @app.delete("/api/progress", status_code=204)

@@ -52,7 +52,8 @@ pytest -v
 | GET | `/api/lessons/{id}/quiz` | the lesson's quiz questions, without the answers |
 | POST | `/api/lessons/{id}/quiz` | body `{"answers": [1, 0, 2]}`; returns score, pass/fail and explanations; a pass is saved |
 | GET | `/api/progress` | finished lessons and totals |
-| DELETE | `/api/progress` | forget all progress (204) |
+| GET | `/api/streak?tz=Europe/Athens` | daily streak (current, best, learned today) in the user's time zone |
+| DELETE | `/api/progress` | forget all progress and streak history (204) |
 
 ## Project structure
 
@@ -60,7 +61,8 @@ pytest -v
 backend/
   main.py            # FastAPI app: API routes + serves the frontend
   db.py              # SQLite: connect, create tables, seed, get_db
-  progress.py        # save and read finished lessons
+  progress.py        # save and read finished lessons, log passes
+  streak.py          # daily streak calculation (time-zone aware)
   schema.sql         # database tables
   seed_data.py       # starting topics, lessons and quiz questions
   wikipedia.py       # Wikipedia API client (with cache)
@@ -79,6 +81,7 @@ tests/
   conftest.py        # fixtures: a fresh test database for every test
   test_db.py         # database tests
   test_progress.py   # saving progress
+  test_streak.py     # streak logic, time zones, fake clock
   test_wikipedia.py  # Wikipedia client tests (no real network calls)
 docs/steps/          # what each step taught me
 ```

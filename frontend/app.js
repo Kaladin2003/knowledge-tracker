@@ -70,6 +70,36 @@ async function loadProgressSummary() {
   }
 }
 
+// The browser knows the user's time zone, e.g. "Europe/Athens".
+// The server needs it to know when "today" starts for this user.
+function userTimeZone() {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+// 🔥 3 · day streak · best 5 · learned today?
+async function loadStreak() {
+  const box = document.getElementById("streak");
+  try {
+    const response = await fetch(`/api/streak?tz=${encodeURIComponent(userTimeZone())}`);
+    if (!response.ok) return;
+    const streak = await response.json();
+
+    document.getElementById("streak-number").textContent = `🔥 ${streak.current}`;
+    document.getElementById("streak-label").textContent =
+      `day streak · best ${streak.best}`;
+    const today = document.getElementById("streak-today");
+    today.textContent = streak.learned_today
+      ? "✓ You learned something today"
+      : streak.current > 0
+        ? "Finish a lesson today to keep your streak"
+        : "Finish a lesson today to start a streak";
+    today.classList.toggle("done", streak.learned_today);
+    box.hidden = false;
+  } catch {
+    // The topics list already shows a "backend not running" message
+  }
+}
+
 // DELETE /api/progress after the user confirms
 async function resetProgress() {
   if (!confirm("Forget all finished lessons? This cannot be undone.")) return;
@@ -77,11 +107,14 @@ async function resetProgress() {
   if (response.ok) {
     loadTopics();
     loadProgressSummary();
+loadStreak();
+    loadStreak();
   }
 }
 
 document.getElementById("reset-progress").addEventListener("click", resetProgress);
 loadProgressSummary();
+loadStreak();
 
 function message(text, className) {
   const item = document.createElement("li");

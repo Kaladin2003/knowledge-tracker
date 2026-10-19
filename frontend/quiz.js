@@ -136,4 +136,21 @@ function showResults(fieldsets, grade) {
   result.replaceChildren(heading, message, retry);
   result.classList.toggle("passed", grade.passed);
   result.hidden = false;
+
+  if (grade.saved) {
+    showStreakAfterPass(message);
+  }
+}
+
+// After a pass, add "🔥 3 day streak" to the result message
+async function showStreakAfterPass(message) {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  try {
+    const response = await fetch(`/api/streak?tz=${encodeURIComponent(timeZone)}`);
+    if (!response.ok) return;
+    const streak = await response.json();
+    message.textContent += ` 🔥 ${streak.current} day streak!`;
+  } catch {
+    // Not important enough to show an error
+  }
 }

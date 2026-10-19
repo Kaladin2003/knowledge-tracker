@@ -24,6 +24,13 @@ def record_completion(db: sqlite3.Connection, lesson_id: str, score: int, now: d
         )
 
 
+def record_pass(db: sqlite3.Connection, lesson_id: str, now: datetime | None = None) -> None:
+    """Log one passed quiz, with the time. Every pass counts (also retakes): the streak uses this log."""
+    now = now or datetime.now(timezone.utc)
+    with db:
+        db.execute("INSERT INTO quiz_passes (lesson_id, passed_at) VALUES (?, ?)", (lesson_id, now.isoformat()))
+
+
 def get_completion(db: sqlite3.Connection, lesson_id: str) -> dict | None:
     """The saved completion of one lesson, or None if it was never passed."""
     row = db.execute("SELECT * FROM completions WHERE lesson_id = ?", (lesson_id,)).fetchone()
@@ -49,6 +56,7 @@ def get_progress(db: sqlite3.Connection) -> dict:
 
 
 def reset_progress(db: sqlite3.Connection) -> None:
-    """Forget all finished lessons."""
-    with db:
+    """Forget all finished lessons and the streak history."""
+    with db:  # both deletes in one transaction
         db.execute("DELETE FROM completions")
+        db.execute("DELETE FROM quiz_passes")
