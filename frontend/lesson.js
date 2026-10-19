@@ -22,7 +22,7 @@ async function loadLessonPage() {
 
     document.title = `${lesson.title} · Knowledge Garden`;
     title.textContent = lesson.title;
-    meta.textContent = `Lesson ${lesson.order} · ${lesson.minutes} min`;
+    meta.textContent = `Lesson ${lesson.position} · ${lesson.minutes} min`;
     document.getElementById("back").href = `topic.html?id=${encodeURIComponent(lesson.topic_id)}`;
 
     showBody(lesson.content);

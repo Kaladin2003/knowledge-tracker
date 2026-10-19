@@ -8,44 +8,59 @@ Run from the project root:
     uvicorn backend.main:app --reload
 """
 
+import json
+import sqlite3
+from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from backend.quizzes import QUIZZES
+from backend.db import DB_PATH, connect, get_db, init_db
 from backend.wikipedia import ArticleNotFound, WikipediaError, fetch_summary
-
-app = FastAPI(title="Knowledge Garden API", version="0.4.0")
 
 PASS_SCORE = 2  # correct answers needed to pass a 3-question quiz
 
-# Hardcoded data for now. A later step moves this into a database.
-TOPICS = [
-    {"id": "bikes", "title": "Bikes", "emoji": "🚲", "description": "How a bicycle works, part by part."},
-    {"id": "space", "title": "Space", "emoji": "🪐", "description": "Our Solar System and the scale of the universe."},
-]
 
-# Each lesson points to its topic with "topic_id".
-# In a database this is called a foreign key: lessons.topic_id -> topics.id
-# "wiki_title" is the Wikipedia article the lesson text comes from.
-LESSONS = [
-    {"id": "bikes-frame", "topic_id": "bikes", "order": 1, "title": "The frame: the bike's skeleton", "minutes": 3, "wiki_title": "Bicycle frame"},
-    {"id": "bikes-drivetrain", "topic_id": "bikes", "order": 2, "title": "The drivetrain: from your legs to the wheel", "minutes": 4, "wiki_title": "Bicycle drivetrain systems"},
-    {"id": "bikes-brakes", "topic_id": "bikes", "order": 3, "title": "Brakes: rim vs disc", "minutes": 3, "wiki_title": "Bicycle brake"},
-    {"id": "space-solar-system", "topic_id": "space", "order": 1, "title": "The Solar System at a glance", "minutes": 3, "wiki_title": "Solar System"},
-    {"id": "space-moon-phases", "topic_id": "space", "order": 2, "title": "Why the Moon has phases", "minutes": 3, "wiki_title": "Lunar phase"},
-    {"id": "space-light-year", "topic_id": "space", "order": 3, "title": "What is a light-year?", "minutes": 3, "wiki_title": "Light-year"},
-]
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Runs once when the server starts: make sure the database is ready."""
+    connection = connect(DB_PATH)
+    init_db(connection)
+    connection.close()
+    yield  # the server runs here
 
 
-def find_topic(topic_id: str) -> dict:
+app = FastAPI(title="Knowledge Garden API", version="0.5.0", lifespan=lifespan)
+
+
+def find_topic(db: sqlite3.Connection, topic_id: str) -> dict:
     """Return the topic with this id, or stop the request with a 404."""
-    for topic in TOPICS:
-        if topic["id"] == topic_id:
-            return topic
-    raise HTTPException(status_code=404, detail="Topic not found")
+    row = db.execute("SELECT * FROM topics WHERE id = ?", (topic_id,)).fetchone()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Topic not found")
+    return dict(row)
+
+
+def find_lesson(db: sqlite3.Connection, lesson_id: str) -> dict:
+    """Return the lesson with this id, or stop the request with a 404."""
+    row = db.execute("SELECT * FROM lessons WHERE id = ?", (lesson_id,)).fetchone()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+    return dict(row)
+
+
+def find_quiz(db: sqlite3.Connection, lesson_id: str) -> list[dict]:
+    """Return the quiz questions of a lesson in order, or stop the request with a 404."""
+    find_lesson(db, lesson_id)  # 404 if the lesson does not exist
+    rows = db.execute(
+        "SELECT * FROM questions WHERE lesson_id = ? ORDER BY position", (lesson_id,)
+    ).fetchall()
+    if not rows:
+        raise HTTPException(status_code=404, detail="This lesson has no quiz yet")
+    # options are stored as JSON text: turn them back into a Python list
+    return [{**dict(row), "options": json.loads(row["options"])} for row in rows]
 
 
 @app.get("/api/health")
@@ -55,41 +70,36 @@ def health():
 
 
 @app.get("/api/topics")
-def list_topics():
+def list_topics(db: sqlite3.Connection = Depends(get_db)):
     """All topics the user can learn."""
-    return TOPICS
+    rows = db.execute("SELECT * FROM topics ORDER BY title").fetchall()
+    return [dict(row) for row in rows]
 
 
 @app.get("/api/topics/{topic_id}")
-def get_topic(topic_id: str):
+def get_topic(topic_id: str, db: sqlite3.Connection = Depends(get_db)):
     """One topic, or 404 if the id does not exist."""
-    return find_topic(topic_id)
+    return find_topic(db, topic_id)
 
 
 @app.get("/api/topics/{topic_id}/lessons")
-def list_lessons(topic_id: str):
+def list_lessons(topic_id: str, db: sqlite3.Connection = Depends(get_db)):
     """The lessons of one topic, in learning order. 404 if the topic does not exist."""
-    find_topic(topic_id)  # raises 404 for an unknown topic
-    lessons = [lesson for lesson in LESSONS if lesson["topic_id"] == topic_id]
-    return sorted(lessons, key=lambda lesson: lesson["order"])
-
-
-def find_lesson(lesson_id: str) -> dict:
-    """Return the lesson with this id, or stop the request with a 404."""
-    for lesson in LESSONS:
-        if lesson["id"] == lesson_id:
-            return lesson
-    raise HTTPException(status_code=404, detail="Lesson not found")
+    find_topic(db, topic_id)  # raises 404 for an unknown topic
+    rows = db.execute(
+        "SELECT * FROM lessons WHERE topic_id = ? ORDER BY position", (topic_id,)
+    ).fetchall()
+    return [dict(row) for row in rows]
 
 
 @app.get("/api/lessons/{lesson_id}")
-def get_lesson(lesson_id: str):
+def get_lesson(lesson_id: str, db: sqlite3.Connection = Depends(get_db)):
     """One lesson with its text, loaded from Wikipedia.
 
     404: unknown lesson id, or the Wikipedia article does not exist.
     502: Wikipedia could not be reached ("Bad Gateway": a server we depend on failed).
     """
-    lesson = find_lesson(lesson_id)
+    lesson = find_lesson(db, lesson_id)
     try:
         content = fetch_summary(lesson["wiki_title"])
     except ArticleNotFound as error:
@@ -108,19 +118,10 @@ def get_lesson(lesson_id: str):
     }
 
 
-def find_quiz(lesson_id: str) -> list[dict]:
-    """Return the quiz of a lesson, or stop the request with a 404."""
-    find_lesson(lesson_id)  # 404 if the lesson does not exist
-    quiz = QUIZZES.get(lesson_id)
-    if quiz is None:
-        raise HTTPException(status_code=404, detail="This lesson has no quiz yet")
-    return quiz
-
-
 @app.get("/api/lessons/{lesson_id}/quiz")
-def get_quiz(lesson_id: str):
+def get_quiz(lesson_id: str, db: sqlite3.Connection = Depends(get_db)):
     """The questions and options, WITHOUT the correct answers."""
-    quiz = find_quiz(lesson_id)
+    quiz = find_quiz(db, lesson_id)
     return [{"question": q["question"], "options": q["options"]} for q in quiz]
 
 
@@ -131,9 +132,9 @@ class QuizAnswers(BaseModel):
 
 
 @app.post("/api/lessons/{lesson_id}/quiz")
-def check_quiz(lesson_id: str, submission: QuizAnswers):
+def check_quiz(lesson_id: str, submission: QuizAnswers, db: sqlite3.Connection = Depends(get_db)):
     """Grade the answers. Only now does the browser learn the correct ones."""
-    quiz = find_quiz(lesson_id)
+    quiz = find_quiz(db, lesson_id)
     if len(submission.answers) != len(quiz):
         raise HTTPException(
             status_code=400,

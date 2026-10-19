@@ -9,6 +9,7 @@ I build it in small steps, one commit at a time, and write down what I learn in 
 
 - **Backend:** Python + [FastAPI](https://fastapi.tiangolo.com)
 - **Frontend:** plain HTML, CSS and JavaScript
+- **Database:** SQLite (`knowledge.db`, created on first start)
 - **Lesson text:** [Wikipedia REST API](https://en.wikipedia.org/api/rest_v1/) (page summaries)
 - **Tests:** pytest
 
@@ -23,6 +24,9 @@ python -m venv .venv
 pip install -r backend/requirements.txt
 uvicorn backend.main:app --reload
 ```
+
+The first start creates `knowledge.db` and fills it from `backend/seed_data.py`.
+To reset the content, stop the server, delete `knowledge.db`, and start again.
 
 Then open:
 
@@ -53,8 +57,10 @@ pytest -v
 ```text
 backend/
   main.py            # FastAPI app: API routes + serves the frontend
+  db.py              # SQLite: connect, create tables, seed, get_db
+  schema.sql         # database tables
+  seed_data.py       # starting topics, lessons and quiz questions
   wikipedia.py       # Wikipedia API client (with cache)
-  quizzes.py         # quiz questions and answers
   requirements.txt
 frontend/
   index.html         # home page: list of topics
@@ -67,6 +73,8 @@ frontend/
   style.css
 tests/
   test_api.py        # API tests (pytest + FastAPI TestClient)
+  conftest.py        # fixtures: a fresh test database for every test
+  test_db.py         # database tests
   test_wikipedia.py  # Wikipedia client tests (no real network calls)
 docs/steps/          # what each step taught me
 ```

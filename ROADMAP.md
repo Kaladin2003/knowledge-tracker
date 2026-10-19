@@ -10,7 +10,7 @@ One step = one commit (or a few small ones). Each step has notes in `docs/steps/
 - [x] **Step 3:** Lessons: `GET /api/topics/{id}/lessons` and a topic page.
 - [x] **Step 4:** Lesson page with text from the Wikipedia API.
 - [x] **Step 5:** Quiz: our own questions per lesson, answers and score in the browser.
-- [ ] **Step 6:** Database: move topics and lessons into SQLite.
+- [x] **Step 6:** Database: move topics and lessons into SQLite.
 - [ ] **Step 7:** Save progress: `POST /api/progress` when a lesson is finished.
 - [ ] **Step 8:** Daily streak logic on the backend, with tests.
 - [ ] **Step 9:** Knowledge tree drawn with SVG.

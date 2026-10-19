@@ -56,7 +56,7 @@ function lessonItem(lesson) {
   name.textContent = lesson.title;
 
   const minutes = document.createElement("p");
-  minutes.textContent = `Lesson ${lesson.order} · ${lesson.minutes} min`;
+  minutes.textContent = `Lesson ${lesson.position} · ${lesson.minutes} min`;
 
   link.append(name, minutes);
   item.appendChild(link);
