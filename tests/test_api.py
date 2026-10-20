@@ -83,7 +83,7 @@ def test_topic_page_is_served(client):
     response = client.get("/topic.html")
 
     assert response.status_code == 200
-    assert "Lessons" in response.text
+    assert 'id="lessons"' in response.text  # the list topic.js fills in
 
 
 # --- Lesson page with Wikipedia content (Step 4) ---

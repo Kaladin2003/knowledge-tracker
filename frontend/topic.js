@@ -1,4 +1,5 @@
-// Topic page: reads the topic id from the URL, then loads the topic and its lessons.
+// Topic page = one section of the field guide.
+// Reads the topic id from the URL, then loads the topic, its lessons and the index (for the section number).
 
 async function loadTopicPage() {
   // topic.html?id=bikes  ->  "bikes"
@@ -7,62 +8,74 @@ async function loadTopicPage() {
   const description = document.getElementById("topic-description");
   const list = document.getElementById("lessons");
 
+  const back = document.getElementById("back");
+  back.replaceChildren(icon("arrowLeft"), "Garden and index");
+
   if (!topicId) {
     title.textContent = "No topic selected";
+    list.replaceChildren();
     return;
   }
 
   try {
-    // Two requests at the same time. Promise.all waits for both.
-    const [topicResponse, lessonsResponse] = await Promise.all([
-      fetch(`/api/topics/${encodeURIComponent(topicId)}`),
-      fetch(`/api/topics/${encodeURIComponent(topicId)}/lessons`),
+    // Three requests at the same time. Promise.all waits for all of them.
+    const [topic, lessons, topics] = await Promise.all([
+      fetchJson(`/api/topics/${encodeURIComponent(topicId)}`),
+      fetchJson(`/api/topics/${encodeURIComponent(topicId)}/lessons`),
+      fetchJson("/api/topics"),
     ]);
-
-    if (topicResponse.status === 404) {
-      title.textContent = "Topic not found";
-      return;
-    }
-    if (!topicResponse.ok || !lessonsResponse.ok) {
-      throw new Error(`HTTP ${topicResponse.status} / ${lessonsResponse.status}`);
-    }
-
-    const topic = await topicResponse.json();
-    const lessons = await lessonsResponse.json();
+    const section = topics.findIndex((item) => item.id === topic.id) + 1;
+    const learned = lessons.filter((lesson) => lesson.completed).length;
 
     document.title = `${topic.title} · Knowledge Garden`;
-    title.textContent = `${topic.emoji} ${topic.title}`;
+    document.getElementById("topic-swatch").replaceChildren(topicSwatch(topic.id));
+    title.textContent = topic.title;
     description.textContent = topic.description;
+    document.getElementById("topic-meta").textContent =
+      `Section ${section} · ${lessons.length} ${lessons.length === 1 ? "entry" : "entries"} · ${learned} learned`;
 
-    list.replaceChildren();
-    for (const lesson of lessons) {
-      list.appendChild(lessonItem(lesson));
-    }
+    list.replaceChildren(...lessons.map((lesson) => entryRow(lesson, section)));
   } catch (error) {
-    title.textContent = "Something went wrong";
+    title.textContent = "Could not open this section";
     description.textContent = `${error.message}. Is the backend running?`;
+    list.replaceChildren();
   }
 }
 
-// One clickable lesson card. Links to lesson.html?id=bikes-frame
-function lessonItem(lesson) {
+// One row: "1.2  Brakes  4 min  Learned  ->". Links to lesson.html?id=bikes-brakes
+function entryRow(lesson, section) {
   const item = document.createElement("li");
 
   const link = document.createElement("a");
-  link.className = "card lesson";
+  link.className = "entry-row";
   link.href = `lesson.html?id=${encodeURIComponent(lesson.id)}`;
 
-  const name = document.createElement("h3");
-  name.textContent = lesson.title;
+  const number = document.createElement("span");
+  number.className = "entry-row-number";
+  number.textContent = entryNumber(section, lesson.position);
 
-  const minutes = document.createElement("p");
-  minutes.textContent = `Lesson ${lesson.position} · ${lesson.minutes} min`;
+  const text = document.createElement("span");
+  const name = document.createElement("span");
+  name.className = "entry-row-title";
+  name.textContent = lesson.title;
+  const minutes = document.createElement("span");
+  minutes.className = "entry-row-minutes";
+  minutes.textContent = `${lesson.minutes} min read`;
+  text.append(name, minutes);
+
+  const status = document.createElement("span");
+  status.className = "status";
   if (lesson.completed) {
-    link.classList.add("completed");
-    minutes.textContent += ` · ✅ Done (best ${lesson.best_score}/3)`;
+    status.classList.add("learned");
+    status.append(icon("check"), `Learned, ${lesson.best_score}/3`);
+  } else {
+    status.textContent = "Not yet";
   }
 
-  link.append(name, minutes);
+  const arrow = icon("arrowRight");
+  arrow.classList.add("arrow");
+
+  link.append(number, text, status, arrow);
   item.appendChild(link);
   return item;
 }

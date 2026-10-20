@@ -1,0 +1,437 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-20T11:35:32.986556Z",
+  "title": "Design System: Knowledge Garden",
+  "extensions": {
+    "colorMeta": {
+      "cover": {
+        "role": "primary",
+        "displayName": "Bottle Green Cover",
+        "tonalRamp": [
+          "#173628",
+          "#265a43",
+          "#357e5e",
+          "#44a278",
+          "#6fc39e",
+          "#a5d9c2",
+          "#d0ebdf",
+          "#edf7f3"
+        ]
+      },
+      "cover-deep": {
+        "role": "primary",
+        "displayName": "Cover Deep",
+        "tonalRamp": [
+          "#163729",
+          "#245b44",
+          "#33805f",
+          "#41a47a",
+          "#6dc59f",
+          "#a4dbc3",
+          "#d0ece0",
+          "#edf8f3"
+        ]
+      },
+      "cover-ink": {
+        "role": "neutral",
+        "displayName": "Cover Ink",
+        "tonalRamp": [
+          "#1c301f",
+          "#2f5034",
+          "#427049",
+          "#55915d",
+          "#7fb386",
+          "#afd0b3",
+          "#d5e6d8",
+          "#eff6f0"
+        ]
+      },
+      "cover-ink-2": {
+        "role": "neutral",
+        "displayName": "Cover Ink 2",
+        "tonalRamp": [
+          "#1e2e24",
+          "#334d3b",
+          "#476c53",
+          "#5b8a6b",
+          "#84ae92",
+          "#b2ccbb",
+          "#d7e5dc",
+          "#f0f5f1"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "tonalRamp": [
+          "#232c20",
+          "#3a4936",
+          "#51674c",
+          "#688461",
+          "#90a88a",
+          "#b9c9b6",
+          "#dbe3d9",
+          "#f1f4f0"
+        ]
+      },
+      "page": {
+        "role": "neutral",
+        "displayName": "Page White",
+        "tonalRamp": [
+          "#262626",
+          "#404040",
+          "#595959",
+          "#737373",
+          "#999999",
+          "#bfbfbf",
+          "#dedede",
+          "#f2f2f2"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "#1e2f26",
+          "#324e3f",
+          "#466d58",
+          "#598c71",
+          "#83af97",
+          "#b1cdbe",
+          "#d7e5dd",
+          "#eff5f2"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2",
+        "tonalRamp": [
+          "#232a25",
+          "#3a463e",
+          "#516257",
+          "#687e70",
+          "#8fa397",
+          "#b9c5be",
+          "#dbe1dd",
+          "#f1f3f2"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule",
+        "tonalRamp": [
+          "#222a23",
+          "#39463b",
+          "#506252",
+          "#677f6a",
+          "#8fa391",
+          "#b9c6ba",
+          "#dae1db",
+          "#f1f4f1"
+        ]
+      },
+      "rule-strong": {
+        "role": "neutral",
+        "displayName": "Rule Strong",
+        "tonalRamp": [
+          "#232a24",
+          "#3a463d",
+          "#516255",
+          "#687d6d",
+          "#8fa394",
+          "#b9c5bc",
+          "#dbe1dc",
+          "#f1f3f2"
+        ]
+      },
+      "action": {
+        "role": "primary",
+        "displayName": "Field Green Action",
+        "tonalRamp": [
+          "#113b28",
+          "#1d6343",
+          "#288a5d",
+          "#34b278",
+          "#61d19d",
+          "#9ce2c2",
+          "#ccf0df",
+          "#ebf9f3"
+        ]
+      },
+      "action-hover": {
+        "role": "primary",
+        "displayName": "Action Hover",
+        "tonalRamp": [
+          "#103d28",
+          "#1b6543",
+          "#258d5e",
+          "#30b679",
+          "#5ed49f",
+          "#9ae4c3",
+          "#cbf1e0",
+          "#ebfaf3"
+        ]
+      },
+      "streak": {
+        "role": "secondary",
+        "displayName": "Rust Streak",
+        "tonalRamp": [
+          "#472306",
+          "#763b0a",
+          "#a5520e",
+          "#d46a12",
+          "#ef9143",
+          "#f5ba89",
+          "#fadbc2",
+          "#fdf1e7"
+        ]
+      },
+      "success": {
+        "role": "status",
+        "displayName": "Success",
+        "tonalRamp": [
+          "#143823",
+          "#225e3b",
+          "#2f8352",
+          "#3da86a",
+          "#69c991",
+          "#a1ddba",
+          "#ceeddb",
+          "#ecf8f1"
+        ]
+      },
+      "success-bg": {
+        "role": "status",
+        "displayName": "Success Bg",
+        "tonalRamp": [
+          "#1a3221",
+          "#2b5437",
+          "#3d764d",
+          "#4e9763",
+          "#79b98b",
+          "#abd4b7",
+          "#d3e8d9",
+          "#eef6f1"
+        ]
+      },
+      "error": {
+        "role": "status",
+        "displayName": "Error",
+        "tonalRamp": [
+          "#440d09",
+          "#70160f",
+          "#9d1f15",
+          "#ca271b",
+          "#e7564b",
+          "#f0958f",
+          "#f7c8c4",
+          "#fceae8"
+        ]
+      },
+      "error-bg": {
+        "role": "status",
+        "displayName": "Error Bg",
+        "tonalRamp": [
+          "#42100b",
+          "#6e1a12",
+          "#9a2519",
+          "#c62f20",
+          "#e35d4f",
+          "#ed9a91",
+          "#f6cac6",
+          "#fbebe9"
+        ]
+      },
+      "selection": {
+        "role": "neutral",
+        "displayName": "Selection",
+        "tonalRamp": [
+          "#1a3222",
+          "#2c5438",
+          "#3d754e",
+          "#4f9765",
+          "#79b98c",
+          "#abd3b7",
+          "#d3e8da",
+          "#eef6f1"
+        ]
+      },
+      "topic-bikes": {
+        "role": "tertiary",
+        "displayName": "Bikes Rust",
+        "tonalRamp": [
+          "#3e200f",
+          "#673518",
+          "#914a22",
+          "#ba5f2c",
+          "#d8875a",
+          "#e7b498",
+          "#f2d8c9",
+          "#faf0ea"
+        ]
+      },
+      "topic-space": {
+        "role": "tertiary",
+        "displayName": "Space Indigo",
+        "tonalRamp": [
+          "#181b35",
+          "#272e58",
+          "#37407b",
+          "#47529f",
+          "#727cc0",
+          "#a7add8",
+          "#d1d4eb",
+          "#edeff7"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Lesson title with inline entry number."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Entry rows, next entry, quiz questions."
+      },
+      "reading": {
+        "displayName": "Reading",
+        "purpose": "Wikipedia lesson text only, max 65ch."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Interface text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Statuses like 'Learned, 3/3'."
+      }
+    },
+    "shadows": [
+      {
+        "name": "plate",
+        "value": "0 1px 2px rgba(23, 36, 29, 0.06), 0 6px 18px rgba(23, 36, 29, 0.06)",
+        "purpose": "Every plate; nothing else casts a shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state",
+        "value": "120ms ease-out",
+        "purpose": "Hover backgrounds and borders."
+      },
+      {
+        "name": "tree-hover",
+        "value": "160ms ease-out",
+        "purpose": "Tree scale 1.06 on hover."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stack",
+        "value": "960px"
+      },
+      {
+        "name": "phone",
+        "value": "600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action on a screen, e.g. Start lesson.",
+      "html": "<a class=\"ds-btn\" href=\"#\">Start lesson <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"M13 6l6 6-6 6\"/></svg></a>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 24px;border:1px solid #1f6b48;border-radius:6px;background:#1f6b48;color:#fff;font:600 1rem/1 system-ui,sans-serif;text-decoration:none;transition:background-color 120ms ease-out}.ds-btn:hover{background:#17573a}.ds-btn:focus-visible{outline:2px solid #1f6b48;outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Second action beside a primary, e.g. Take it again.",
+      "html": "<button class=\"ds-btn2\">Take it again</button>",
+      "css": ".ds-btn2{min-height:44px;padding:0 24px;border:1px solid #1f6b48;border-radius:6px;background:#fff;color:#1f6b48;font:600 1rem/1 system-ui,sans-serif;cursor:pointer;transition:background-color 120ms ease-out}.ds-btn2:hover{background:#e2f0e6}.ds-btn2:focus-visible{outline:2px solid #1f6b48;outline-offset:2px}"
+    },
+    {
+      "name": "Top Bar",
+      "kind": "nav",
+      "refersTo": "topbar",
+      "description": "The guide's cover: wordmark plus streak and entries.",
+      "html": "<header class=\"ds-top\"><span class=\"ds-mark\">Knowledge Garden</span><span class=\"ds-stat\"><b>3</b> day streak</span><span class=\"ds-stat\"><b>2</b> of 6 entries learned</span></header>",
+      "css": ".ds-top{display:flex;align-items:center;gap:24px;padding:14px 24px;background:#1f4a37;color:#b9d1c1;font:0.95rem system-ui,sans-serif}.ds-mark{font:600 1.5rem 'Barlow Condensed','Arial Narrow',sans-serif;color:#eef5ef;margin-right:auto}.ds-stat b{font:600 1.25rem 'Barlow Condensed','Arial Narrow',sans-serif;color:#eef5ef;margin-right:6px}"
+    },
+    {
+      "name": "Plate",
+      "kind": "card",
+      "refersTo": "plate",
+      "description": "Every content block: a white page on the ground.",
+      "html": "<section class=\"ds-plate\"><h2>Daily streak</h2><p>3 days in a row</p><p class=\"ds-cap\">Plate 1. Every tree is a lesson you passed.</p></section>",
+      "css": ".ds-plate{background:#fff;border:1px solid #d4dcd5;border-radius:6px;box-shadow:0 1px 2px rgba(23,36,29,.06),0 6px 18px rgba(23,36,29,.06);padding:24px;color:#17241d;font:1rem/1.5 system-ui,sans-serif}.ds-plate h2{font:600 1.375rem/1.1 'Barlow Condensed','Arial Narrow',sans-serif;margin:0 0 12px}.ds-cap{border-top:1px solid #d4dcd5;padding-top:12px;margin-top:12px;font-size:.9rem;color:#4c5c52}"
+    },
+    {
+      "name": "Entry Row",
+      "kind": "custom",
+      "refersTo": "entry-row",
+      "description": "One numbered entry in a section's ruled list.",
+      "html": "<a class=\"ds-row\" href=\"#\"><span class=\"ds-n\">1.3</span><span><span class=\"ds-t\">Brakes: rim vs disc</span><span class=\"ds-m\">3 min read</span></span><span class=\"ds-s\">Learned, 3/3</span></a>",
+      "css": ".ds-row{display:grid;grid-template-columns:3.5rem 1fr auto;align-items:center;gap:16px;padding:16px 24px;color:#17241d;text-decoration:none;background:#fff;border-top:1px solid #d4dcd5;transition:background-color 120ms ease-out}.ds-row:hover{background:#f6f8f5}.ds-row:focus-visible{outline:2px solid #1f6b48}.ds-n{font:600 1.5rem 'Barlow Condensed','Arial Narrow',sans-serif;color:#4c5c52;font-variant-numeric:tabular-nums}.ds-t{display:block;font:600 1.35rem/1.15 'Barlow Condensed','Arial Narrow',sans-serif}.ds-m{display:block;font:.875rem system-ui,sans-serif;color:#4c5c52}.ds-s{font:600 .875rem system-ui,sans-serif;color:#2a7449}"
+    },
+    {
+      "name": "Quiz Option",
+      "kind": "input",
+      "refersTo": "option-right",
+      "description": "A self-test answer; tinted right or wrong after grading.",
+      "html": "<label class=\"ds-opt\"><input type=\"radio\" name=\"q\"> In the rain</label><label class=\"ds-opt ds-right\"><input type=\"radio\" name=\"q\" checked> A rotor at the centre of the wheel</label><label class=\"ds-opt ds-wrong\"><input type=\"radio\" name=\"q\"> On flat roads</label>",
+      "css": ".ds-opt{display:flex;align-items:center;gap:12px;padding:12px 16px;margin-top:8px;border:1px solid #d4dcd5;border-radius:6px;font:1rem system-ui,sans-serif;color:#17241d;cursor:pointer;transition:border-color 120ms ease-out,background-color 120ms ease-out}.ds-opt:hover{border-color:#b3c0b6;background:#f8faf7}.ds-opt input{accent-color:#1f6b48}.ds-right{border-color:#2a7449;background:#e2f0e6}.ds-wrong{border-color:#b42318;background:#fbe8e6}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Personal Field Guide",
+    "overview": "Knowledge Garden is drawn as a naturalist's field guide that the reader writes by learning. Topics are numbered sections, lessons are numbered entries (2.3 = section 2, entry 3), the garden is a captioned plate, and the topic list is an index. The cover is a deep bottle green; the pages are white plates resting on a pale grey-green ground, separated by hairline rules.\n\nThe system is calm and dense enough for a five-minute daily visit: one obvious next step, honest numbers, no confetti. Expression lives in the details a field guide would have: tabular entry numbers, condensed display lettering, plate captions, and topic colours carried by small tree pictograms. It rejects the cartoon learning-app look: no mascots, no bubbly gradients, no emoji used as icons.",
+    "keyCharacteristics": [
+      "Numbered everything: sections, entries, plates.",
+      "White plates on a grey-green ground with hairline rules, not floating cards.",
+      "Condensed display face for headings and numbers, a serif only for reading, system UI for controls.",
+      "Colour is reserved: one green action colour, one rust streak colour, and per-topic plate colours on trees and swatches."
+    ],
+    "rules": [
+      {
+        "name": "The One Rust Rule",
+        "body": "Rust means the streak. Never use it for buttons, links or decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Topic-Colour Rule",
+        "body": "Topic colours appear only on topic marks: trees, swatches. Text and controls stay green and ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The Inline Number Rule",
+        "body": "An entry number sits on the same line as its title (`1.3 Brakes: rim vs disc`) or in a column beside it. It never sits above a heading as a kicker.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Every number that can change (entry numbers, counts, scores, streak) uses `font-variant-numeric: tabular-nums`.",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "**Do** number sections and entries and show the number with the title.",
+      "**Do** credit Wikipedia under every lesson with a link and the licence.",
+      "**Do** keep every interactive element keyboard-reachable, garden trees included (`tabindex=\"0\"`, `role=\"button\"`, Enter/Space)."
+    ],
+    "donts": [
+      "**Don't** use emoji as icons; add a path to `ICON_PATHS` instead.",
+      "**Don't** put a small label above a heading (kicker/eyebrow).",
+      "**Don't** use rust outside the streak, or topic colours on text and controls.",
+      "**Don't** add a coloured stripe on the side of a card or a gradient on text."
+    ]
+  }
+}

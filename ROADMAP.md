@@ -14,7 +14,11 @@ One step = one commit (or a few small ones). Each step has notes in `docs/steps/
 - [x] **Step 7:** Save progress: a passed quiz is saved in the database; `GET`/`DELETE /api/progress`.
 - [x] **Step 8:** Daily streak logic on the backend, with tests.
 - [x] **Step 9:** Knowledge garden: one SVG tree per finished lesson, click a tree to see why it was planted.
-- [ ] **Step 10:** Users: sign up and log in.
+- [x] **Step 10:** Field Guide redesign: numbered sections and entries, garden plate, self-test, DESIGN.md.
+- [ ] **Step 11:** Big library: import topics and lessons from Wikipedia's Vital Articles.
+- [ ] **Step 12:** Quiz generator: make questions from the lesson text (spaCy, then a local LLM).
+- [ ] **Step 13:** Search any topic.
+- [ ] **Step 14:** Users: sign up and log in.
 
 ## Phase 2: smarter lessons
 

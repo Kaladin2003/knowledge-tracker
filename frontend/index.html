@@ -4,45 +4,67 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Knowledge Garden</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f4a37'/%3E%3Crect x='15' y='17' width='2.5' height='9' rx='1' fill='%23c9a27a'/%3E%3Ccircle cx='16' cy='13' r='8' fill='%2382c08f'/%3E%3Ccircle cx='12.6' cy='15' r='4.8' fill='%235a9e6b'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <header>
-      <h1>🌱 Knowledge Garden</h1>
-      <p class="subtitle">Learn something new every day.</p>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="wordmark" href="/">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="14.75" y="17" width="2.5" height="10" rx="1" fill="#c9a27a" />
+            <circle cx="16" cy="12.5" r="9" fill="#82c08f" />
+            <circle cx="12.2" cy="14.8" r="5.4" fill="#5a9e6b" />
+          </svg>
+          Knowledge Garden
+        </a>
+        <!-- common.js fills these two with the streak and the number of learned entries -->
+        <div class="topbar-stats">
+          <span id="topbar-streak" class="topbar-stat"></span>
+          <span id="topbar-entries" class="topbar-stat"></span>
+        </div>
+      </div>
     </header>
 
-    <main>
-      <!-- app.js fills this with the daily streak -->
-      <section id="streak" class="card streak" hidden>
-        <div id="streak-number" class="streak-number"></div>
-        <div>
-          <p id="streak-label" class="streak-label"></p>
-          <p id="streak-today" class="streak-today"></p>
+    <main class="page home">
+      <!-- The garden plate: one tree per learned entry (garden.js) -->
+      <section class="plate garden-plate" aria-labelledby="garden-title">
+        <div class="plate-heading">
+          <h1 id="garden-title">Your garden</h1>
+          <p id="garden-status">Loading…</p>
         </div>
-      </section>
-
-      <!-- garden.js draws the garden here -->
-      <section class="card garden-card">
-        <h2>Your garden</h2>
-        <p id="garden-status" class="muted">Loading…</p>
         <div id="garden" class="garden"></div>
-        <div id="tree-info" class="tree-info" hidden></div>
+        <p class="plate-caption">Plate 1. Every tree is a lesson you passed. Its colour is the topic; a full crown with fruit means 3 of 3 on the self-test.</p>
+        <article id="tree-info" class="entry" hidden aria-live="polite"></article>
       </section>
 
-      <!-- app.js fills this with "You finished X of Y lessons" -->
-      <p id="progress-summary" class="card progress-summary" hidden></p>
+      <div class="side">
+        <!-- The next lesson to learn (app.js) -->
+        <section class="plate panel" aria-labelledby="next-heading">
+          <h2 id="next-heading">Next entry</h2>
+          <div id="next-entry"><p class="muted">Loading…</p></div>
+        </section>
 
-      <h2>Topics</h2>
-      <!-- app.js fills this list with data from the API -->
-      <ul id="topics" class="topics">
-        <li class="muted">Loading…</li>
-      </ul>
+        <!-- Daily streak (app.js) -->
+        <section class="plate panel" aria-labelledby="streak-heading">
+          <h2 id="streak-heading">Daily streak</h2>
+          <div id="streak"><p class="muted">Loading…</p></div>
+        </section>
 
-      <button id="reset-progress" class="link-button">Reset progress</button>
+        <!-- Index of topics (app.js) -->
+        <section class="plate panel" aria-labelledby="index-heading">
+          <h2 id="index-heading">Index</h2>
+          <ol id="topics" class="index-list">
+            <li class="list-message">Loading…</li>
+          </ol>
+          <div class="reset-row">
+            <button id="reset-progress" class="text-button" type="button">Reset all progress</button>
+          </div>
+        </section>
+      </div>
     </main>
 
+    <script src="common.js"></script>
     <script src="app.js"></script>
     <script src="garden.js"></script>
   </body>

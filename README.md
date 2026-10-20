@@ -70,15 +70,17 @@ backend/
   wikipedia.py       # Wikipedia API client (with cache)
   requirements.txt
 frontend/
-  index.html         # home page: list of topics
-  app.js             # loads the topics
-  topic.html         # topic page: list of lessons
-  topic.js           # loads one topic and its lessons
-  lesson.html        # lesson page: text from Wikipedia
+  common.js          # shared by every page: icons, topic colours, fetchJson, top bar stats
+  index.html         # home page: garden plate, next entry, streak, index of topics
+  app.js             # next entry, streak and index
+  garden.js          # draws the isometric garden (SVG); click a tree to open its entry
+  topic.html         # topic page = one numbered section of the guide
+  topic.js           # loads one topic and its entries
+  lesson.html        # lesson page: text from Wikipedia, then the self-test
   lesson.js          # loads one lesson
-  quiz.js            # quiz: load questions, send answers, show the grade
-  garden.js          # draws the isometric garden (SVG); click a tree to see why it was planted
-  style.css
+  quiz.js            # self-test: load questions, send answers, show the grade
+  style.css          # the Field Guide design (tokens at the top)
+  fonts/             # self-hosted Barlow Condensed and Source Serif 4 (OFL)
 tests/
   test_api.py        # API tests (pytest + FastAPI TestClient)
   conftest.py        # fixtures: a fresh test database for every test
@@ -88,11 +90,15 @@ tests/
   test_garden.py     # garden and caching
   test_wikipedia.py  # Wikipedia client tests (no real network calls)
 docs/steps/          # what each step taught me
+PRODUCT.md           # who the app is for and what it must do
+DESIGN.md            # the design system: colours, type, components, rules
 ```
 
 ## Credits
 
 Lesson text comes from [Wikipedia](https://www.wikipedia.org), licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Each lesson page links to its source article.
+
+Fonts: [Barlow Condensed](https://fonts.google.com/specimen/Barlow+Condensed) and [Source Serif 4](https://fonts.google.com/specimen/Source+Serif+4), both under the SIL Open Font License (see `frontend/fonts/README.md`).
 
 ## Steps
 

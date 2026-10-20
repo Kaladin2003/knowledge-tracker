@@ -1,35 +1,53 @@
-// Lesson page: reads the lesson id from the URL and shows its text from Wikipedia.
+// Lesson page = one entry of the field guide: read it, then take the self-test.
+// Reads the lesson id from the URL and shows its text from Wikipedia.
 
 async function loadLessonPage() {
   const lessonId = new URLSearchParams(window.location.search).get("id");
   const title = document.getElementById("lesson-title");
   const meta = document.getElementById("lesson-meta");
+  const back = document.getElementById("back");
+  back.replaceChildren(icon("arrowLeft"), "Back");
 
   if (!lessonId) {
     title.textContent = "No lesson selected";
     return;
   }
-  setUpQuiz(lessonId); // defined in quiz.js; the quiz works even if Wikipedia is down
+  setUpQuiz(lessonId); // defined in quiz.js; the self-test works even if Wikipedia is down
 
   try {
-    const response = await fetch(`/api/lessons/${encodeURIComponent(lessonId)}`);
-    if (!response.ok) {
-      // FastAPI puts the error message in "detail"
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.detail || `HTTP ${response.status}`);
-    }
-    const lesson = await response.json();
+    const [lesson, topics] = await Promise.all([
+      fetchJson(`/api/lessons/${encodeURIComponent(lessonId)}`),
+      fetchJson("/api/topics").catch(() => []),
+    ]);
+    const sectionIndex = topics.findIndex((topic) => topic.id === lesson.topic_id);
+    const topic = topics[sectionIndex];
 
     document.title = `${lesson.title} · Knowledge Garden`;
-    title.textContent = lesson.title;
-    meta.textContent = `Lesson ${lesson.position} · ${lesson.minutes} min`;
-    if (lesson.completion) {
-      meta.textContent += ` · ✅ Done (best score ${lesson.completion.best_score}/3)`;
+    if (topic) {
+      document.getElementById("lesson-number").textContent = entryNumber(sectionIndex + 1, lesson.position);
+      back.replaceChildren(icon("arrowLeft"), `Section ${sectionIndex + 1}: ${topic.title}`);
     }
-    document.getElementById("back").href = `topic.html?id=${encodeURIComponent(lesson.topic_id)}`;
+    back.href = `topic.html?id=${encodeURIComponent(lesson.topic_id)}`;
+    title.textContent = lesson.title;
+
+    const minutes = document.createElement("span");
+    minutes.className = "status";
+    minutes.append(icon("clock"), `${lesson.minutes} min read`);
+    const status = document.createElement("span");
+    status.className = "status";
+    if (lesson.completion) {
+      status.classList.add("learned");
+      status.append(icon("check"), `Learned, best ${lesson.completion.best_score}/3`);
+    } else {
+      status.textContent = "Not learned yet";
+    }
+    const section = document.createElement("span");
+    section.textContent = topic ? topic.title : "";
+    meta.replaceChildren(...(topic ? [section] : []), minutes, status);
 
     showBody(lesson.content);
     showSource(lesson.source, lesson.content.title);
+    document.getElementById("lesson-body").hidden = false;
   } catch (error) {
     title.textContent = "Could not load this lesson";
     meta.textContent = error.message;
@@ -37,22 +55,26 @@ async function loadLessonPage() {
 }
 
 function showBody(content) {
-  const body = document.getElementById("lesson-body");
-  body.replaceChildren();
+  const reading = document.getElementById("reading");
+  // Wikipedia's extract is plain text; line breaks separate paragraphs
+  const paragraphs = content.extract.split("\n").filter((line) => line.trim());
+  reading.replaceChildren(
+    ...paragraphs.map((text) => {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = text;
+      return paragraph;
+    }),
+  );
 
+  const figure = document.getElementById("figure");
   if (content.image) {
     const image = document.createElement("img");
     image.src = content.image;
     image.alt = content.title;
-    image.className = "lesson-image";
-    body.appendChild(image);
-  }
-
-  // Wikipedia's extract is plain text; blank lines separate paragraphs
-  for (const text of content.extract.split("\n").filter((line) => line.trim())) {
-    const paragraph = document.createElement("p");
-    paragraph.textContent = text;
-    body.appendChild(paragraph);
+    const caption = document.createElement("figcaption");
+    caption.textContent = `Fig. ${content.title}`;
+    figure.replaceChildren(image, caption);
+    figure.hidden = false;
   }
 }
 

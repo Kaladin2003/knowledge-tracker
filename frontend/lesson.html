@@ -4,31 +4,59 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Lesson · Knowledge Garden</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f4a37'/%3E%3Crect x='15' y='17' width='2.5' height='9' rx='1' fill='%23c9a27a'/%3E%3Ccircle cx='16' cy='13' r='8' fill='%2382c08f'/%3E%3Ccircle cx='12.6' cy='15' r='4.8' fill='%235a9e6b'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <header>
-      <a id="back" href="/" class="back">← Back</a>
-      <!-- lesson.js fills these in -->
-      <h1 id="lesson-title">Loading…</h1>
-      <p id="lesson-meta" class="subtitle"></p>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="wordmark" href="/">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="14.75" y="17" width="2.5" height="10" rx="1" fill="#c9a27a" />
+            <circle cx="16" cy="12.5" r="9" fill="#82c08f" />
+            <circle cx="12.2" cy="14.8" r="5.4" fill="#5a9e6b" />
+          </svg>
+          Knowledge Garden
+        </a>
+        <!-- common.js fills these two with the streak and the number of learned entries -->
+        <div class="topbar-stats">
+          <span id="topbar-streak" class="topbar-stat"></span>
+          <span id="topbar-entries" class="topbar-stat"></span>
+        </div>
+      </div>
     </header>
 
-    <main>
-      <article id="lesson-body" class="card lesson-body"></article>
-      <p id="lesson-source" class="source"></p>
+    <main class="page">
+      <a id="back" href="/" class="back-link"></a>
 
-      <section id="quiz-section" class="quiz-section" hidden>
-        <h2>Quiz</h2>
-        <button id="start-quiz" class="button">Start quiz</button>
+      <!-- lesson.js fills these in -->
+      <header class="lesson-head">
+        <h1><span id="lesson-number" class="lesson-number"></span> <span id="lesson-title">Loading…</span></h1>
+        <div id="lesson-meta" class="lesson-meta"></div>
+      </header>
+
+      <article id="lesson-body" class="plate lesson-body" hidden>
+        <div id="reading" class="reading"></div>
+        <figure id="figure" class="figure" hidden></figure>
+        <p id="lesson-source" class="source"></p>
+      </article>
+
+      <section id="quiz-section" class="quiz-section" aria-labelledby="quiz-heading" hidden>
+        <div class="plate quiz-intro">
+          <div>
+            <h2 id="quiz-heading">Self-test</h2>
+            <p>Three questions. Get two right to plant this entry in your garden.</p>
+          </div>
+          <button id="start-quiz" class="button" type="button">Start the self-test</button>
+        </div>
         <!-- quiz.js builds the questions inside this form -->
         <form id="quiz-form" hidden></form>
-        <div id="quiz-result" class="card quiz-result" hidden></div>
+        <div id="quiz-result" class="plate quiz-result" hidden aria-live="polite"></div>
       </section>
     </main>
 
-    <!-- quiz.js first: lesson.js calls setUpQuiz(), defined in quiz.js -->
+    <!-- common.js first (shared helpers), then quiz.js: lesson.js calls setUpQuiz(), defined in quiz.js -->
+    <script src="common.js"></script>
     <script src="quiz.js"></script>
     <script src="lesson.js"></script>
   </body>

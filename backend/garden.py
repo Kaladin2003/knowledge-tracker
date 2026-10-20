@@ -17,6 +17,7 @@ def get_garden(db: sqlite3.Connection) -> dict:
         """
         SELECT c.lesson_id,
                l.title     AS lesson_title,
+               l.position  AS lesson_position,
                t.id        AS topic_id,
                t.title     AS topic_title,
                t.emoji     AS topic_emoji,

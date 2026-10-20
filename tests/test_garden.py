@@ -40,6 +40,7 @@ def test_tree_says_why_it_was_planted(client):
 
     tree = client.get("/api/garden").json()["trees"][0]
     assert tree["lesson_title"] == "The frame: the bike's skeleton"
+    assert tree["lesson_position"] == 1
     assert tree["topic_title"] == "Bikes"
     assert tree["topic_emoji"] == "🚲"
     assert tree["best_score"] == 2
