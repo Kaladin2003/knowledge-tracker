@@ -382,8 +382,12 @@ p {
   color: var(--streak);
 }
 
+/* The garden sits on a dark green backdrop, so the bright block stands out */
 .garden {
-  margin: var(--s2) calc(var(--s2) * -1) 0;
+  margin: var(--s4) 0 var(--s4);
+  padding: var(--s4) var(--s5) var(--s5);
+  background: var(--cover-deep);
+  border-radius: var(--radius);
 }
 
 .garden-svg {
@@ -415,10 +419,43 @@ p {
   outline: none;
 }
 
-.tree:focus-visible .tree-crown,
-.tree.selected .tree-crown {
-  stroke: var(--ink);
-  stroke-width: 2;
+.tree-ring {
+  fill: none;
+  stroke: transparent;
+}
+
+.tree:focus-visible .tree-ring,
+.tree.selected .tree-ring {
+  fill: rgba(255, 255, 255, 0.18);
+  stroke: #ffffff;
+  stroke-width: 2.5;
+}
+
+/* Key to the trees, under the plate caption */
+.tree-key {
+  list-style: none;
+  margin: var(--s3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  font-size: 0.875rem;
+}
+
+.tree-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+}
+
+.tree-key .swatch {
+  width: 20px;
+  height: 24px;
+}
+
+.tree-key li.unused {
+  color: var(--ink-2);
+  opacity: 0.55;
 }
 
 /* A specimen entry, opened from the garden */
@@ -560,8 +597,8 @@ p {
 }
 
 .swatch {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 28px;
   flex: none;
 }
 
@@ -630,7 +667,7 @@ p {
 
 .topic-header .swatch {
   width: 56px;
-  height: 56px;
+  height: 66px;
 }
 
 .topic-header p {

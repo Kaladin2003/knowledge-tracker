@@ -5,7 +5,7 @@ import sqlite3
 import pytest
 
 from backend.db import connect, init_db
-from backend.seed_data import LESSONS, QUIZZES, TOPICS
+from backend.seed_data import CATEGORIES, LESSONS, QUIZZES, TOPICS
 
 
 def count(db, table):
@@ -76,3 +76,38 @@ def test_query_parameters_block_sql_injection(client):
 def test_completion_of_unknown_lesson_is_blocked(db):
     with pytest.raises(sqlite3.IntegrityError):
         db.execute("INSERT INTO completions (lesson_id, completed_at, best_score) VALUES ('nope', '2026-01-01', 3)")
+
+
+# --- Migration (Step 11) ---
+
+OLD_TOPICS_TABLE = """
+CREATE TABLE topics (
+    id          TEXT PRIMARY KEY,
+    title       TEXT NOT NULL,
+    emoji       TEXT NOT NULL,
+    description TEXT NOT NULL
+)
+"""
+
+
+def test_old_database_gets_categories(tmp_path):
+    # A knowledge.db made before Step 11: topics has no category_id column
+    connection = connect(tmp_path / "old.db")
+    connection.execute(OLD_TOPICS_TABLE)
+    connection.execute("INSERT INTO topics VALUES ('bikes', 'Bikes', '🚲', 'How a bicycle works.')")
+    connection.commit()
+
+    init_db(connection)  # what the server does on start
+
+    columns = {row["name"] for row in connection.execute("PRAGMA table_info(topics)")}
+    assert "category_id" in columns
+    bikes = connection.execute("SELECT * FROM topics WHERE id = 'bikes'").fetchone()
+    assert bikes["category_id"] == "technology"
+    assert bikes["title"] == "Bikes"  # existing data is kept
+    connection.close()
+
+
+def test_every_seed_topic_has_a_known_category():
+    category_ids = {c["id"] for c in CATEGORIES}
+    for topic in TOPICS:
+        assert topic["category_id"] in category_ids, topic["id"]

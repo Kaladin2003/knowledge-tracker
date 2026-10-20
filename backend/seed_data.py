@@ -3,9 +3,23 @@
 To add content: edit this file, then delete knowledge.db and restart the server.
 """
 
+# Step 11: categories. The frontend gives each one its own tree species (see frontend/trees.js).
+# Later the Wikipedia Vital Articles importer will map its sections onto these.
+CATEGORIES = [
+    {"id": "technology", "title": "Technology", "description": "Machines, tools and how they work."},
+    {"id": "science", "title": "Science", "description": "Physics, chemistry, space and the Earth."},
+    {"id": "nature", "title": "Nature and health", "description": "Living things and the human body."},
+    {"id": "psychology", "title": "Psychology", "description": "How the mind works."},
+    {"id": "philosophy", "title": "Philosophy", "description": "Big questions, ideas and beliefs."},
+    {"id": "history", "title": "History", "description": "What happened, and why."},
+    {"id": "arts", "title": "Arts", "description": "Music, painting, literature and film."},
+    {"id": "society", "title": "Society", "description": "Economics, politics and how people live together."},
+    {"id": "mathematics", "title": "Mathematics", "description": "Numbers, shapes and patterns."},
+]
+
 TOPICS = [
-    {"id": "bikes", "title": "Bikes", "emoji": "🚲", "description": "How a bicycle works, part by part."},
-    {"id": "space", "title": "Space", "emoji": "🪐", "description": "Our Solar System and the scale of the universe."},
+    {"id": "bikes", "title": "Bikes", "emoji": "🚲", "description": "How a bicycle works, part by part.", "category_id": "technology"},
+    {"id": "space", "title": "Space", "emoji": "🪐", "description": "Our Solar System and the scale of the universe.", "category_id": "science"},
 ]
 
 # position = learning order inside the topic

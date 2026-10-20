@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-20T11:35:32.986556Z",
+  "generatedAt": "2026-10-20T11:57:36.030466+00:00",
   "title": "Design System: Knowledge Garden",
   "extensions": {
     "colorMeta": {
@@ -256,32 +256,46 @@
           "#eef6f1"
         ]
       },
-      "topic-bikes": {
+      "grass-light": {
         "role": "tertiary",
-        "displayName": "Bikes Rust",
+        "displayName": "Grass",
         "tonalRamp": [
-          "#3e200f",
-          "#673518",
-          "#914a22",
-          "#ba5f2c",
-          "#d8875a",
-          "#e7b498",
-          "#f2d8c9",
-          "#faf0ea"
+          "#2d4a12",
+          "#4a7a1f",
+          "#679f30",
+          "#86c04a",
+          "#a6d46b",
+          "#bfe08f",
+          "#d7ecb5",
+          "#eef7e0"
         ]
       },
-      "topic-space": {
+      "grass-dark": {
         "role": "tertiary",
-        "displayName": "Space Indigo",
+        "displayName": "Grass Shade",
         "tonalRamp": [
-          "#181b35",
-          "#272e58",
-          "#37407b",
-          "#47529f",
-          "#727cc0",
-          "#a7add8",
-          "#d1d4eb",
-          "#edeff7"
+          "#2a4510",
+          "#44701c",
+          "#5f952c",
+          "#7ab545",
+          "#97c95c",
+          "#b4d888",
+          "#d0e7b1",
+          "#ebf5df"
+        ]
+      },
+      "soil": {
+        "role": "tertiary",
+        "displayName": "Soil",
+        "tonalRamp": [
+          "#2a1a10",
+          "#45291a",
+          "#633c26",
+          "#7d4e31",
+          "#8d5d3b",
+          "#ae8264",
+          "#cfac95",
+          "#ecdcd1"
         ]
       }
     },
@@ -398,7 +412,7 @@
       "Numbered everything: sections, entries, plates.",
       "White plates on a grey-green ground with hairline rules, not floating cards.",
       "Condensed display face for headings and numbers, a serif only for reading, system UI for controls.",
-      "Colour is reserved: one green action colour, one rust streak colour, and per-topic plate colours on trees and swatches."
+      "Colour is reserved in the interface (one green action colour, one rust streak colour); the garden is where colour lives, one tree species per category."
     ],
     "rules": [
       {
@@ -407,8 +421,8 @@
         "section": "colors"
       },
       {
-        "name": "The Topic-Colour Rule",
-        "body": "Topic colours appear only on topic marks: trees, swatches. Text and controls stay green and ink.",
+        "name": "The Species Rule",
+        "body": "A category is shown by its tree species (in the garden, the index, the topic header and the key), never by a coloured label. Text and controls stay green and ink.",
         "section": "colors"
       },
       {
@@ -430,7 +444,8 @@
     "donts": [
       "**Don't** use emoji as icons; add a path to `ICON_PATHS` instead.",
       "**Don't** put a small label above a heading (kicker/eyebrow).",
-      "**Don't** use rust outside the streak, or topic colours on text and controls.",
+      "**Don't** use rust outside the streak, or tree colours on text and controls.",
+      "**Don't** copy another app's garden artwork; draw new species in `trees.js` in the same flat-shaded style.",
       "**Don't** add a coloured stripe on the side of a card or a gradient on text."
     ]
   }

@@ -52,6 +52,7 @@ pytest -v
 | GET | `/api/lessons/{id}/quiz` | the lesson's quiz questions, without the answers |
 | POST | `/api/lessons/{id}/quiz` | body `{"answers": [1, 0, 2]}`; returns score, pass/fail and explanations; a pass is saved |
 | GET | `/api/progress` | finished lessons and totals |
+| GET | `/api/categories` | all categories, with how many topics each has |
 | GET | `/api/garden` | one tree per finished lesson (why it was planted), plus the garden size |
 | GET | `/api/streak?tz=Europe/Athens` | daily streak (current, best, learned today) in the user's time zone |
 | DELETE | `/api/progress` | forget all progress and streak history (204) |
@@ -74,6 +75,7 @@ frontend/
   index.html         # home page: garden plate, next entry, streak, index of topics
   app.js             # next entry, streak and index
   garden.js          # draws the isometric garden (SVG); click a tree to open its entry
+  trees.js           # one tree species per category (pine, blossom, oak...) and topic swatches
   topic.html         # topic page = one numbered section of the guide
   topic.js           # loads one topic and its entries
   lesson.html        # lesson page: text from Wikipedia, then the self-test

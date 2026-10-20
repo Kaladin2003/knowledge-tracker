@@ -20,8 +20,9 @@ colors:
   error: "#b42318"
   error-bg: "#fbe8e6"
   selection: "#cfe6d6"
-  topic-bikes: "#c0622d"
-  topic-space: "#4a56a6"
+  grass-light: "#a6d46b"
+  grass-dark: "#97c95c"
+  soil: "#8d5d3b"
 typography:
   display:
     fontFamily: "Barlow Condensed, Arial Narrow, sans-serif"
@@ -111,7 +112,7 @@ The system is calm and dense enough for a five-minute daily visit: one obvious n
 - Numbered everything: sections, entries, plates.
 - White plates on a grey-green ground with hairline rules, not floating cards.
 - Condensed display face for headings and numbers, a serif only for reading, system UI for controls.
-- Colour is reserved: one green action colour, one rust streak colour, and per-topic plate colours on trees and swatches.
+- Colour is reserved in the interface (one green action colour, one rust streak colour); the garden is where colour lives, one tree species per category.
 
 ## Colors
 
@@ -124,8 +125,9 @@ A cool, botanical palette: bottle-green cover, grey-green ground, near-black gre
 ### Secondary
 - **Rust Streak** (#a8540e): the streak flame and the thirsty-garden status. Nothing else uses it.
 
-### Topic plate colours
-- **Bikes Rust** (#c0622d, shade #8f4320) and **Space Indigo** (#4a56a6, shade #323d80): tree crowns and topic swatches. Topics without a set colour get a hue from a hash of their id (`topicColor()` in `common.js`), at 45% saturation.
+### Garden colours
+- **Grass** (#a6d46b / #97c95c checkerboard, edge #7fb04a) and **Soil** (#8d5d3b left side, #6f4630 right side) on a **Cover Deep** (#173a2b) backdrop.
+- **Tree species** (in `frontend/trees.js`), one per category, each with a dark / mid / light palette: Pine (technology), Lantern tree (science), Apple tree (nature and health), Blossom tree (psychology), Olive tree (philosophy), Oak (history), Flower bush (arts), Maple (society), Topiary (mathematics). Unknown categories grow an oak. A thirsty garden turns every species dry brown (#7d6346 / #9b7d58 / #bc9f76).
 
 ### Neutral
 - **Ground** (#edf1ec): the page background.
@@ -135,7 +137,7 @@ A cool, botanical palette: bottle-green cover, grey-green ground, near-black gre
 
 ### Named Rules
 **The One Rust Rule.** Rust means the streak. Never use it for buttons, links or decoration.
-**The Topic-Colour Rule.** Topic colours appear only on topic marks: trees, swatches. Text and controls stay green and ink.
+**The Species Rule.** A category is shown by its tree species (in the garden, the index, the topic header and the key), never by a coloured label. Text and controls stay green and ink.
 
 ## Typography
 
@@ -170,15 +172,17 @@ The system is mostly flat. Plates carry one quiet ambient shadow so they read as
 
 ## Shapes
 
-Radius is small and consistent: 6px for plates, buttons, options and entry cards; 4px for lesson figures; 2px for meters. The garden is the one illustrated shape: isometric 96×48 diamond tiles with a soil edge, and trees built from a trunk plus two overlapping circles (fruit dots mean 3/3).
+Radius is small and consistent: 6px for plates, buttons, options, entry cards and the garden backdrop; 4px for lesson figures; 2px for meters. The garden is the one illustrated shape: an isometric block of 96×48 diamond tiles with a wavy grass edge over the soil, grass tufts and tiny flowers on empty tiles. Trees are flat-shaded vector shapes lit from the upper right (dark base, mid colour, soft highlight; trunks split into a shaded and a lit half). A 3/3 tree is full size with fruit or flowers; a 2/3 tree is drawn at 72% without them.
 
 ## Components
 
 - **Top bar:** cover green, wordmark (tree mark plus display face), and two stats: flame + streak number, leaves + "N of M entries learned". The flame turns warm (#f2a65a) when the streak is alive.
 - **Plate:** white, 1px rule border, 6px radius, plate shadow. Every content block is a plate.
 - **Plate caption:** a hairline rule above, then small Ink 2 text starting "Plate N.".
-- **Entry card (tree info):** the entry number in a large left column, then the title, a `dl` of Topic / Planted / Self-test, and one link.
-- **Index row and entry row:** a ruled list; number column, topic swatch, name with a description, count, and a 3px meter in action green.
+- **Garden:** the block on a Cover Deep backdrop; a selected or focused tree gets a white ring on its tile.
+- **Key to the trees:** under the plate caption, every category with its small tree; categories without topics are faded.
+- **Entry card (tree info):** the entry number in a large left column, then the title, a `dl` of Topic / Tree / Planted / Self-test, and one link.
+- **Index row and entry row:** a ruled list; number column, the category's tree as the topic mark, name with a description, count, and a 3px meter in action green.
 - **Buttons:** primary is filled field green, 44px minimum height, with an optional trailing arrow icon. Secondary is white with green text. Text buttons are underlined ink and turn red on hover (only "Reset all progress").
 - **Quiz option:** a bordered row with a radio; checked is green-tinted. After grading, the right answer is success-tinted with a check icon and a wrong pick is error-tinted with a cross icon. Each question ends with a bold "Correct." or "Not quite." and the explanation.
 - **Icons:** authored 24×24 line icons (1.75 stroke, round caps) from `ICON_PATHS` in `common.js`. Never emoji.
@@ -190,5 +194,6 @@ Radius is small and consistent: 6px for plates, buttons, options and entry cards
 - **Do** keep every interactive element keyboard-reachable, garden trees included (`tabindex="0"`, `role="button"`, Enter/Space).
 - **Don't** use emoji as icons; add a path to `ICON_PATHS` instead.
 - **Don't** put a small label above a heading (kicker/eyebrow).
-- **Don't** use rust outside the streak, or topic colours on text and controls.
+- **Don't** use rust outside the streak, or tree colours on text and controls.
+- **Don't** copy another app's garden artwork; draw new species in `trees.js` in the same flat-shaded style.
 - **Don't** add a coloured stripe on the side of a card or a gradient on text.

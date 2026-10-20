@@ -1,10 +1,18 @@
 -- Database structure. Run on every start: "IF NOT EXISTS" makes it safe to repeat.
 
+-- Step 11: big groups of knowledge. Each category grows its own kind of tree in the garden.
+CREATE TABLE IF NOT EXISTS categories (
+    id          TEXT PRIMARY KEY,            -- "technology"
+    title       TEXT NOT NULL,
+    description TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS topics (
     id          TEXT PRIMARY KEY,            -- "bikes"
     title       TEXT NOT NULL,
     emoji       TEXT NOT NULL,
-    description TEXT NOT NULL
+    description TEXT NOT NULL,
+    category_id TEXT REFERENCES categories(id)  -- Step 11. Older databases get it from migrate() in db.py
 );
 
 CREATE TABLE IF NOT EXISTS lessons (

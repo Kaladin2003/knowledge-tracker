@@ -1,5 +1,5 @@
 // Home page: the index of topics, the next entry to learn, and the daily streak.
-// Helpers like fetchJson, icon and topicSwatch come from common.js.
+// Helpers like fetchJson and icon come from common.js; topicSwatch from trees.js.
 
 let topicsCache = []; // the topics in index order; their position is the section number
 
@@ -54,7 +54,7 @@ function indexRow(topic, sectionNumber) {
   fill.style.width = topic.lesson_count ? `${(topic.completed_count / topic.lesson_count) * 100}%` : "0%";
   meter.appendChild(fill);
 
-  link.append(number, topicSwatch(topic.id), text, count, meter);
+  link.append(number, topicSwatch(topic.category_id), text, count, meter);
   item.appendChild(link);
   return item;
 }

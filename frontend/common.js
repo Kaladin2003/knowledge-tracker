@@ -1,4 +1,5 @@
-// Shared by every page: icons, topic colours, swatches and the top bar.
+// Shared by every page: icons, entry numbers, fetchJson and the top bar.
+// The tree species (and topicSwatch) live in trees.js.
 
 const SVG_NS = "http://www.w3.org/2000/svg"; // SVG elements need their own namespace
 
@@ -33,40 +34,6 @@ function icon(name, label) {
     const path = document.createElementNS(SVG_NS, "path");
     path.setAttribute("d", d);
     svg.appendChild(path);
-  }
-  return svg;
-}
-
-// Each topic has its own plate colour, used for its trees and its swatch.
-// Unknown topics get a colour from their id: a tiny hash turned into a hue.
-const TOPIC_COLORS = {
-  bikes: { crown: "#c0622d", shade: "#8f4320", fruit: "#f4d58d" },
-  space: { crown: "#4a56a6", shade: "#323d80", fruit: "#f6e27a" },
-};
-
-function topicColor(topicId) {
-  if (TOPIC_COLORS[topicId]) return TOPIC_COLORS[topicId];
-  let hash = 0;
-  for (const char of topicId) hash = (hash * 31 + char.charCodeAt(0)) % 360;
-  return { crown: `hsl(${hash} 45% 45%)`, shade: `hsl(${hash} 45% 32%)`, fruit: "#f4d58d" };
-}
-
-// A small tree pictogram in the topic's colour: the topic's mark in lists and headers.
-function topicSwatch(topicId) {
-  const color = topicColor(topicId);
-  const svg = document.createElementNS(SVG_NS, "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("class", "swatch");
-  svg.setAttribute("aria-hidden", "true");
-  const parts = [
-    ["rect", { x: 11, y: 13, width: 2, height: 8, rx: 1, fill: "#6d4c41" }],
-    ["circle", { cx: 12, cy: 10, r: 7, fill: color.crown }],
-    ["circle", { cx: 9.2, cy: 11.4, r: 4.2, fill: color.shade }],
-  ];
-  for (const [tag, attributes] of parts) {
-    const element = document.createElementNS(SVG_NS, tag);
-    for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
-    svg.appendChild(element);
   }
   return svg;
 }

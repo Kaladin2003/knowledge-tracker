@@ -53,7 +53,15 @@ async def no_cache_for_pages(request: Request, call_next):
 
 def find_topic(db: sqlite3.Connection, topic_id: str) -> dict:
     """Return the topic with this id, or stop the request with a 404."""
-    row = db.execute("SELECT * FROM topics WHERE id = ?", (topic_id,)).fetchone()
+    row = db.execute(
+        """
+        SELECT t.*, c.title AS category_title
+        FROM topics t
+        LEFT JOIN categories c ON c.id = t.category_id
+        WHERE t.id = ?
+        """,
+        (topic_id,),
+    ).fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="Topic not found")
     return dict(row)
@@ -85,15 +93,32 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/api/categories")
+def list_categories(db: sqlite3.Connection = Depends(get_db)):
+    """All categories, each with how many topics it has (a category can be empty for now)."""
+    rows = db.execute(
+        """
+        SELECT c.id, c.title, c.description, COUNT(t.id) AS topic_count
+        FROM categories c
+        LEFT JOIN topics t ON t.category_id = c.id
+        GROUP BY c.id
+        ORDER BY c.title
+        """
+    ).fetchall()
+    return [dict(row) for row in rows]
+
+
 @app.get("/api/topics")
 def list_topics(db: sqlite3.Connection = Depends(get_db)):
     """All topics, each with how many lessons it has and how many are finished."""
     rows = db.execute(
         """
         SELECT t.id, t.title, t.emoji, t.description,
+               t.category_id, cat.title AS category_title,
                COUNT(l.id)        AS lesson_count,
                COUNT(c.lesson_id) AS completed_count
         FROM topics t
+        LEFT JOIN categories cat ON cat.id = t.category_id
         LEFT JOIN lessons l     ON l.topic_id = t.id
         LEFT JOIN completions c ON c.lesson_id = l.id
         GROUP BY t.id

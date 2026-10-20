@@ -31,7 +31,9 @@ def test_list_topics_returns_all_topics(client):
     assert len(topics) >= 2
     # Every topic has the fields the web page needs
     for topic in topics:
-        assert set(topic) == {"id", "title", "emoji", "description", "lesson_count", "completed_count"}
+        assert set(topic) == {
+            "id", "title", "emoji", "description", "category_id", "category_title", "lesson_count", "completed_count",
+        }
 
 
 def test_get_one_topic(client):
@@ -198,3 +200,23 @@ def test_quiz_invalid_body_returns_422(client):
 
 def test_quiz_of_unknown_lesson_returns_404(client):
     assert client.get("/api/lessons/does-not-exist/quiz").status_code == 404
+
+
+# --- Categories (Step 11) ---
+
+
+def test_list_categories(client):
+    response = client.get("/api/categories")
+
+    assert response.status_code == 200
+    categories = {c["id"]: c for c in response.json()}
+    assert categories["technology"]["topic_count"] == 1  # bikes
+    assert categories["science"]["topic_count"] == 1  # space
+    assert categories["psychology"]["topic_count"] == 0  # no topics yet, but the category exists
+
+
+def test_topic_has_a_category(client):
+    topic = client.get("/api/topics/bikes").json()
+
+    assert topic["category_id"] == "technology"
+    assert topic["category_title"] == "Technology"

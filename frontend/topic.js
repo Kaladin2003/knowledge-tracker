@@ -28,11 +28,11 @@ async function loadTopicPage() {
     const learned = lessons.filter((lesson) => lesson.completed).length;
 
     document.title = `${topic.title} · Knowledge Garden`;
-    document.getElementById("topic-swatch").replaceChildren(topicSwatch(topic.id));
+    document.getElementById("topic-swatch").replaceChildren(topicSwatch(topic.category_id));
     title.textContent = topic.title;
     description.textContent = topic.description;
     document.getElementById("topic-meta").textContent =
-      `Section ${section} · ${lessons.length} ${lessons.length === 1 ? "entry" : "entries"} · ${learned} learned`;
+      `${topic.category_title ? `${topic.category_title} · ` : ""}Section ${section} · ${lessons.length} ${lessons.length === 1 ? "entry" : "entries"} · ${learned} learned`;
 
     list.replaceChildren(...lessons.map((lesson) => entryRow(lesson, section)));
   } catch (error) {

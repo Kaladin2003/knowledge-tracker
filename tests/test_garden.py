@@ -43,6 +43,8 @@ def test_tree_says_why_it_was_planted(client):
     assert tree["lesson_position"] == 1
     assert tree["topic_title"] == "Bikes"
     assert tree["topic_emoji"] == "🚲"
+    assert tree["category_id"] == "technology"  # Step 11: the category picks the tree species
+    assert tree["category_title"] == "Technology"
     assert tree["best_score"] == 2
     assert tree["planted_at"]
 

@@ -34,7 +34,9 @@
           <p id="garden-status">Loading…</p>
         </div>
         <div id="garden" class="garden"></div>
-        <p class="plate-caption">Plate 1. Every tree is a lesson you passed. Its colour is the topic; a full crown with fruit means 3 of 3 on the self-test.</p>
+        <p class="plate-caption">Plate 1. Every tree is a lesson you passed. Each category grows its own kind of tree; a fully grown tree with fruit or flowers means 3 of 3 on the self-test.</p>
+        <!-- Key to the trees: one species per category (garden.js) -->
+        <ul id="tree-key" class="tree-key" aria-label="Key to the trees"></ul>
         <article id="tree-info" class="entry" hidden aria-live="polite"></article>
       </section>
 
@@ -65,6 +67,7 @@
     </main>
 
     <script src="common.js"></script>
+    <script src="trees.js"></script>
     <script src="app.js"></script>
     <script src="garden.js"></script>
   </body>

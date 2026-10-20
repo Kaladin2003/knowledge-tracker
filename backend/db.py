@@ -29,12 +29,51 @@ def connect(path: Path = DB_PATH) -> sqlite3.Connection:
 
 
 def init_db(connection: sqlite3.Connection) -> None:
-    """Create the tables, and fill them with the seed content if they are empty."""
+    """Create the tables, update an older database, and fill empty tables with the seed content."""
     connection.executescript(SCHEMA_FILE.read_text(encoding="utf-8"))
+    migrate(connection)
+    seed_categories(connection)
 
     topic_count = connection.execute("SELECT COUNT(*) FROM topics").fetchone()[0]
     if topic_count == 0:
         seed(connection)
+    else:
+        fill_missing_categories(connection)
+
+
+def column_names(connection: sqlite3.Connection, table: str) -> set[str]:
+    """The columns a table has right now (PRAGMA table_info lists them)."""
+    return {row["name"] for row in connection.execute(f"PRAGMA table_info({table})")}
+
+
+def migrate(connection: sqlite3.Connection) -> None:
+    """Bring a database made by an older version of the app up to date.
+
+    "CREATE TABLE IF NOT EXISTS" never changes a table that already exists,
+    so a new column has to be added by hand. Data already saved stays as it is.
+    """
+    # Step 11: topics.category_id
+    if "category_id" not in column_names(connection, "topics"):
+        with connection:
+            connection.execute("ALTER TABLE topics ADD COLUMN category_id TEXT REFERENCES categories(id)")
+
+
+def seed_categories(connection: sqlite3.Connection) -> None:
+    """Add any category from seed_data.py that the database does not have yet."""
+    with connection:
+        connection.executemany(
+            "INSERT OR IGNORE INTO categories (id, title, description) VALUES (:id, :title, :description)",
+            seed_data.CATEGORIES,
+        )
+
+
+def fill_missing_categories(connection: sqlite3.Connection) -> None:
+    """Older databases have topics without a category: take it from seed_data.py."""
+    with connection:
+        connection.executemany(
+            "UPDATE topics SET category_id = :category_id WHERE id = :id AND category_id IS NULL",
+            seed_data.TOPICS,
+        )
 
 
 def seed(connection: sqlite3.Connection) -> None:
@@ -42,7 +81,8 @@ def seed(connection: sqlite3.Connection) -> None:
     # "with connection" = one transaction: either everything is saved, or nothing.
     with connection:
         connection.executemany(
-            "INSERT INTO topics (id, title, emoji, description) VALUES (:id, :title, :emoji, :description)",
+            "INSERT INTO topics (id, title, emoji, description, category_id) "
+            "VALUES (:id, :title, :emoji, :description, :category_id)",
             seed_data.TOPICS,
         )
         connection.executemany(

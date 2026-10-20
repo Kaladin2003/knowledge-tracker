@@ -21,11 +21,14 @@ def get_garden(db: sqlite3.Connection) -> dict:
                t.id        AS topic_id,
                t.title     AS topic_title,
                t.emoji     AS topic_emoji,
+               t.category_id,
+               cat.title   AS category_title,
                c.completed_at AS planted_at,
                c.best_score
         FROM completions c
         JOIN lessons l ON l.id = c.lesson_id
         JOIN topics  t ON t.id = l.topic_id
+        LEFT JOIN categories cat ON cat.id = t.category_id
         ORDER BY c.completed_at, c.lesson_id
         """
     ).fetchall()
