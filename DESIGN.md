@@ -127,7 +127,7 @@ A cool, botanical palette: bottle-green cover, grey-green ground, near-black gre
 
 ### Garden colours
 - **Grass** (#a6d46b / #97c95c checkerboard, edge #7fb04a) and **Soil** (#8d5d3b left side, #6f4630 right side) on a **Cover Deep** (#173a2b) backdrop.
-- **Tree species** (in `frontend/trees.js`), one per category, each with a dark / mid / light palette: Pine (technology), Lantern tree (science), Apple tree (nature and health), Blossom tree (psychology), Olive tree (philosophy), Oak (history), Flower bush (arts), Maple (society), Topiary (mathematics). Unknown categories grow an oak. A thirsty garden turns every species dry brown (#7d6346 / #9b7d58 / #bc9f76).
+- **Tree species** (in `frontend/trees.js`), one per category, each with a dark / mid / light palette: Pine (technology), Lantern tree (science), Apple tree (nature and health), Blossom tree (psychology), Olive tree (philosophy), Oak (history), Flower bush (arts), Maple (society), Topiary (mathematics), Palm tree (geography). Unknown categories grow an oak. A thirsty garden turns every species dry brown (#7d6346 / #9b7d58 / #bc9f76).
 
 ### Neutral
 - **Ground** (#edf1ec): the page background.
@@ -182,6 +182,7 @@ Radius is small and consistent: 6px for plates, buttons, options, entry cards an
 - **Garden:** the block on a Cover Deep backdrop; a selected or focused tree gets a white ring on its tile.
 - **Key to the trees:** under the plate caption, every category with its small tree; categories without topics are faded.
 - **Entry card (tree info):** the entry number in a large left column, then the title, a `dl` of Topic / Tree / Planted / Self-test, and one link.
+- **Index:** on the home page it lists categories (tree, name, topic count, learned count, meter); each opens a category page that lists its topics as entry rows with their section numbers.
 - **Index row and entry row:** a ruled list; number column, the category's tree as the topic mark, name with a description, count, and a 3px meter in action green.
 - **Buttons:** primary is filled field green, 44px minimum height, with an optional trailing arrow icon. Secondary is white with green text. Text buttons are underlined ink and turn red on hover (only "Reset all progress").
 - **Quiz option:** a bordered row with a radio; checked is green-tinted. After grading, the right answer is success-tinted with a check icon and a wrong pick is error-tinted with a cross icon. Each question ends with a bold "Correct." or "Not quite." and the explanation.

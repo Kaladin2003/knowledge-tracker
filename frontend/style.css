@@ -583,6 +583,15 @@ p {
   transition: background-color 120ms ease-out;
 }
 
+/* Category rows have no section number: tree, name, count */
+.index-row.category-row {
+  grid-template-columns: auto 1fr auto;
+}
+
+.index-row.category-row .meter {
+  grid-column: 2 / 4;
+}
+
 .index-row:hover {
   background: var(--ground);
   color: var(--ink);

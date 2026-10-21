@@ -15,6 +15,7 @@ CATEGORIES = [
     {"id": "arts", "title": "Arts", "description": "Music, painting, literature and film."},
     {"id": "society", "title": "Society", "description": "Economics, politics and how people live together."},
     {"id": "mathematics", "title": "Mathematics", "description": "Numbers, shapes and patterns."},
+    {"id": "geography", "title": "Geography", "description": "Countries, cities, rivers and the planet."},  # Step 12
 ]
 
 TOPICS = [

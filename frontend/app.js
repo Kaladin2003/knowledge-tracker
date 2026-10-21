@@ -1,92 +1,69 @@
-// Home page: the index of topics, the next entry to learn, and the daily streak.
+// Home page: the next entry to learn, the daily streak, and the index of categories.
 // Helpers like fetchJson and icon come from common.js; topicSwatch from trees.js.
 
-let topicsCache = []; // the topics in index order; their position is the section number
-
-async function loadTopics() {
+// The index lists categories; each one opens a page with its topics (category.html).
+async function loadIndex() {
   const list = document.getElementById("topics");
 
   try {
     // Same server, so a relative URL is enough: no CORS setup needed.
-    topicsCache = await fetchJson("/api/topics");
+    const categories = await fetchJson("/api/categories");
+    const used = categories.filter((category) => category.topic_count > 0);
 
-    list.replaceChildren(); // remove "Loading…"
-    topicsCache.forEach((topic, index) => list.appendChild(indexRow(topic, index + 1)));
-    loadNextEntry();
+    list.replaceChildren(...used.map(categoryRow)); // also removes "Loading…"
   } catch (error) {
-    list.replaceChildren(message(`Could not load topics: ${error.message}. Is the backend running?`, "error"));
-    document.getElementById("next-entry").replaceChildren(paragraph("The index is not available right now.", "muted"));
+    list.replaceChildren(message(`Could not load the index: ${error.message}. Is the backend running?`, "error"));
   }
 }
 
-// One row of the index: section number, swatch, name, "1/3", and a thin progress meter
-function indexRow(topic, sectionNumber) {
+// One row of the index: tree, name, "3 topics · 1/12", and a thin progress meter
+function categoryRow(category) {
   const item = document.createElement("li");
 
   const link = document.createElement("a");
-  link.className = "index-row";
-  link.href = `topic.html?id=${encodeURIComponent(topic.id)}`;
-
-  const number = document.createElement("span");
-  number.className = "section-number";
-  number.textContent = sectionNumber;
+  link.className = "index-row category-row";
+  link.href = `category.html?id=${encodeURIComponent(category.id)}`;
 
   const text = document.createElement("span");
   const name = document.createElement("span");
   name.className = "index-name";
-  name.textContent = topic.title;
+  name.textContent = category.title;
   const description = document.createElement("span");
   description.className = "index-description";
-  description.textContent = topic.description;
+  description.textContent = `${category.topic_count} ${category.topic_count === 1 ? "topic" : "topics"} · ${category.description}`;
   text.append(name, description);
 
-  const count = document.createElement("span");
-  count.className = "index-count";
-  count.textContent = `${topic.completed_count}/${topic.lesson_count}`;
-  count.setAttribute("aria-label", `${topic.completed_count} of ${topic.lesson_count} learned`);
-  const complete = topic.lesson_count > 0 && topic.completed_count === topic.lesson_count;
-  count.classList.toggle("complete", complete);
-
-  const meter = document.createElement("span");
-  meter.className = "meter";
-  meter.setAttribute("aria-hidden", "true");
-  const fill = document.createElement("span");
-  fill.style.width = topic.lesson_count ? `${(topic.completed_count / topic.lesson_count) * 100}%` : "0%";
-  meter.appendChild(fill);
-
-  link.append(number, topicSwatch(topic.category_id), text, count, meter);
+  link.append(topicSwatch(category.id), text, progressCount(category.completed_count, category.lesson_count), meter(category.completed_count, category.lesson_count));
   item.appendChild(link);
   return item;
 }
 
-// The next entry: the first lesson not learned yet, in index order
+// The next entry: the server picks it (GET /api/next)
 async function loadNextEntry() {
   const slot = document.getElementById("next-entry");
-  const sectionIndex = topicsCache.findIndex((topic) => topic.completed_count < topic.lesson_count);
-
-  if (sectionIndex === -1) {
-    slot.replaceChildren(
-      paragraph("You have learned every entry in the guide.", "next-meta"),
-      paragraph("New topics are coming. Until then, retake a self-test to grow a young tree to full size.", "muted"),
-    );
-    return;
-  }
 
   try {
-    const topic = topicsCache[sectionIndex];
-    const lessons = await fetchJson(`/api/topics/${encodeURIComponent(topic.id)}/lessons`);
-    const lesson = lessons.find((item) => !item.completed);
+    const [lesson, topics] = await Promise.all([fetchJson("/api/next"), fetchJson("/api/topics")]);
 
+    if (!lesson) {
+      slot.replaceChildren(
+        paragraph("You have learned every entry that has a self-test.", "next-meta"),
+        paragraph("Library entries can already be read; their self-tests are coming soon. Until then, retake a self-test to grow a young tree.", "muted"),
+      );
+      return;
+    }
+
+    const topic = topics.find((item) => item.id === lesson.topic_id);
     // "1.2  The drivetrain…": the entry number sits beside the title, like a field guide entry
     const title = document.createElement("p");
     title.className = "next-title";
     const number = document.createElement("span");
     number.className = "next-number";
-    number.textContent = entryNumber(sectionIndex + 1, lesson.position);
+    number.textContent = entryNumber(topic.section, lesson.position);
     title.append(number, " ", lesson.title);
     const meta = document.createElement("p");
     meta.className = "next-meta";
-    meta.append(`${topic.title} · `, icon("clock"), ` ${lesson.minutes} min read, then a 3-question self-test`);
+    meta.append(`${lesson.topic_title} · `, icon("clock"), ` ${lesson.minutes} min read, then a 3-question self-test`);
 
     const start = document.createElement("a");
     start.className = "button";
@@ -137,7 +114,8 @@ async function resetProgress() {
   if (!confirm("Forget every learned entry and your streak? This cannot be undone.")) return;
   const response = await fetch("/api/progress", { method: "DELETE" });
   if (response.ok) {
-    loadTopics();
+    loadIndex();
+    loadNextEntry();
     loadStreak();
     loadTopbarStats(); // defined in common.js
     loadGarden(); // defined in garden.js
@@ -159,5 +137,6 @@ function message(text, className) {
 }
 
 document.getElementById("reset-progress").addEventListener("click", resetProgress);
-loadTopics();
+loadIndex();
+loadNextEntry();
 loadStreak();

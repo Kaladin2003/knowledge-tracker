@@ -35,7 +35,7 @@ async def lifespan(app: FastAPI):
     yield  # the server runs here
 
 
-app = FastAPI(title="Knowledge Garden API", version="0.8.0", lifespan=lifespan)
+app = FastAPI(title="Knowledge Garden API", version="0.12.0", lifespan=lifespan)
 
 
 @app.middleware("http")
@@ -95,12 +95,17 @@ def health():
 
 @app.get("/api/categories")
 def list_categories(db: sqlite3.Connection = Depends(get_db)):
-    """All categories, each with how many topics it has (a category can be empty for now)."""
+    """All categories, with how many topics and lessons each has, and how many lessons are finished."""
     rows = db.execute(
         """
-        SELECT c.id, c.title, c.description, COUNT(t.id) AS topic_count
+        SELECT c.id, c.title, c.description,
+               COUNT(DISTINCT t.id) AS topic_count,
+               COUNT(l.id)          AS lesson_count,
+               COUNT(done.lesson_id) AS completed_count
         FROM categories c
-        LEFT JOIN topics t ON t.category_id = c.id
+        LEFT JOIN topics t         ON t.category_id = c.id
+        LEFT JOIN lessons l        ON l.topic_id = t.id
+        LEFT JOIN completions done ON done.lesson_id = l.id
         GROUP BY c.id
         ORDER BY c.title
         """
@@ -109,8 +114,11 @@ def list_categories(db: sqlite3.Connection = Depends(get_db)):
 
 
 @app.get("/api/topics")
-def list_topics(db: sqlite3.Connection = Depends(get_db)):
-    """All topics, each with how many lessons it has and how many are finished."""
+def list_topics(category: str | None = None, db: sqlite3.Connection = Depends(get_db)):
+    """All topics (or the topics of one category), each with how many lessons it has and how many are finished.
+
+    Order: the order they were added (rowid), so section numbers never change when the library grows.
+    """
     rows = db.execute(
         """
         SELECT t.id, t.title, t.emoji, t.description,
@@ -122,10 +130,42 @@ def list_topics(db: sqlite3.Connection = Depends(get_db)):
         LEFT JOIN lessons l     ON l.topic_id = t.id
         LEFT JOIN completions c ON c.lesson_id = l.id
         GROUP BY t.id
-        ORDER BY t.title
+        ORDER BY t.rowid
         """
     ).fetchall()
-    return [dict(row) for row in rows]
+    topics = [dict(row) for row in rows]
+    # Section numbers count ALL topics, so filter after numbering
+    for number, topic in enumerate(topics, start=1):
+        topic["section"] = number
+    if category:
+        topics = [topic for topic in topics if topic["category_id"] == category]
+    return topics
+
+
+@app.get("/api/next")
+def next_lesson(db: sqlite3.Connection = Depends(get_db)):
+    """The next lesson to learn, or null when there is none.
+
+    Only lessons with a self-test count (you can't plant a tree without one).
+    A topic you have started comes first; then topics in index order.
+    """
+    row = db.execute(
+        """
+        SELECT l.*, t.title AS topic_title
+        FROM lessons l
+        JOIN topics t ON t.id = l.topic_id
+        WHERE l.id NOT IN (SELECT lesson_id FROM completions)
+          AND EXISTS (SELECT 1 FROM questions q WHERE q.lesson_id = l.id)
+        ORDER BY EXISTS (
+                   SELECT 1 FROM completions c JOIN lessons done ON done.id = c.lesson_id
+                   WHERE done.topic_id = t.id
+                 ) DESC,
+                 t.rowid,
+                 l.position
+        LIMIT 1
+        """
+    ).fetchone()
+    return dict(row) if row else None
 
 
 @app.get("/api/topics/{topic_id}")
@@ -140,7 +180,8 @@ def list_lessons(topic_id: str, db: sqlite3.Connection = Depends(get_db)):
     find_topic(db, topic_id)  # raises 404 for an unknown topic
     rows = db.execute(
         """
-        SELECT l.*, c.best_score
+        SELECT l.*, c.best_score,
+               EXISTS (SELECT 1 FROM questions q WHERE q.lesson_id = l.id) AS has_quiz
         FROM lessons l
         LEFT JOIN completions c ON c.lesson_id = l.id
         WHERE l.topic_id = ?
@@ -149,7 +190,10 @@ def list_lessons(topic_id: str, db: sqlite3.Connection = Depends(get_db)):
         (topic_id,),
     ).fetchall()
     # best_score is NULL (None) when the lesson was never passed
-    return [{**dict(row), "completed": row["best_score"] is not None} for row in rows]
+    return [
+        {**dict(row), "completed": row["best_score"] is not None, "has_quiz": bool(row["has_quiz"])}
+        for row in rows
+    ]
 
 
 @app.get("/api/lessons/{lesson_id}")
@@ -170,6 +214,7 @@ def get_lesson(lesson_id: str, db: sqlite3.Connection = Depends(get_db)):
     return {
         **lesson,
         "completion": get_completion(db, lesson_id),  # None if not finished yet
+        "has_quiz": db.execute("SELECT 1 FROM questions WHERE lesson_id = ?", (lesson_id,)).fetchone() is not None,
         "content": content,
         "source": {
             "name": "Wikipedia",

@@ -1,0 +1,41 @@
+<!-- A small hand-made sample in the same format as the real list page
+     (Wikipedia:Vital articles/Level/3). Used by tests/test_vital_articles.py. -->
+This page lists the most important articles. {{Vital articles}}
+# [[Wikipedia:Vital articles]] (a link before the first section: ignored)
+
+== People (6 articles) ==
+=== Writers and journalists (3 articles) ===
+{{columns-list|colwidth=15em|
+# {{Icon|FA}} [[William Shakespeare]]
+# {{Icon|B}} [[Homer]]
+# {{Icon|GA}} [[Leo Tolstoy|Tolstoy]]
+}}
+=== Philosophers and social scientists (2 articles) ===
+# {{Icon|B}} [[Plato]]
+# {{Icon|C}} [[Confucius]]
+=== Political leaders (1 article) ===
+# {{Icon|FA}} [[Julius Caesar]]
+
+== Geography (2 articles) ==
+# {{Icon|B}} [[Earth]]
+# {{Icon|B}} [[Nile]]
+
+== [[Society]] and social sciences (3/4 articles) ==
+=== Psychology ===
+# {{Icon|B}} [[Psychology]]
+# {{Icon|C}} [[Emotion]]
+=== Economics ===
+# [[File:Example.jpg]] {{Icon|B}} ''[[economics]]''
+==== Basic concepts ====
+# {{Icon|C}} [[Money#History|money]]
+
+== Physical sciences (2 articles) ==
+=== Basics ===
+* {{Icon|GA}} [[Physics]]
+* {{Icon|B}} [[Chemistry]]
+
+== Miscellaneous ==
+# [[Something without a category]]
+
+== Technology ==
+=== Empty heading ===

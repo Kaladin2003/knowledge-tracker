@@ -33,6 +33,7 @@ def test_list_topics_returns_all_topics(client):
     for topic in topics:
         assert set(topic) == {
             "id", "title", "emoji", "description", "category_id", "category_title", "lesson_count", "completed_count",
+            "section",
         }
 
 
@@ -220,3 +221,51 @@ def test_topic_has_a_category(client):
 
     assert topic["category_id"] == "technology"
     assert topic["category_title"] == "Technology"
+
+
+# --- Big library helpers (Step 12) ---
+
+
+def test_topics_keep_their_section_number_and_can_be_filtered(client):
+    topics = client.get("/api/topics").json()
+    assert [(t["id"], t["section"]) for t in topics[:2]] == [("bikes", 1), ("space", 2)]  # order they were added
+
+    science = client.get("/api/topics?category=science").json()
+    assert [(t["id"], t["section"]) for t in science] == [("space", 2)]  # same number, even when filtered
+
+
+def test_category_counts_lessons(client):
+    pass_bikes_frame(client)
+
+    technology = next(c for c in client.get("/api/categories").json() if c["id"] == "technology")
+    assert (technology["topic_count"], technology["lesson_count"], technology["completed_count"]) == (1, 3, 1)
+
+
+def test_next_lesson_continues_the_started_topic(client):
+    assert client.get("/api/next").json()["id"] == "bikes-frame"  # nothing started: first topic, first lesson
+
+    client.post("/api/lessons/space-solar-system/quiz", json={"answers": right_answers("space-solar-system")})
+
+    assert client.get("/api/next").json()["id"] == "space-moon-phases"  # Space was started
+
+
+def test_next_lesson_is_null_when_everything_is_learned(client):
+    for lesson in client.get("/api/topics/bikes/lessons").json() + client.get("/api/topics/space/lessons").json():
+        client.post(f"/api/lessons/{lesson['id']}/quiz", json={"answers": right_answers(lesson["id"])})
+
+    assert client.get("/api/next").json() is None
+
+
+def test_lessons_say_if_they_have_a_quiz(client):
+    lessons = client.get("/api/topics/bikes/lessons").json()
+    assert all(lesson["has_quiz"] for lesson in lessons)
+
+
+def right_answers(lesson_id):
+    from backend.seed_data import QUIZZES
+
+    return [q["answer"] for q in QUIZZES[lesson_id]]
+
+
+def pass_bikes_frame(client):
+    client.post("/api/lessons/bikes-frame/quiz", json={"answers": right_answers("bikes-frame")})

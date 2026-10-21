@@ -16,7 +16,7 @@ One step = one commit (or a few small ones). Each step has notes in `docs/steps/
 - [x] **Step 9:** Knowledge garden: one SVG tree per finished lesson, click a tree to see why it was planted.
 - [x] **Step 10:** Field Guide redesign: numbered sections and entries, garden plate, self-test, DESIGN.md.
 - [x] **Step 11:** Categories and tree species: each category grows its own kind of tree.
-- [ ] **Step 12:** Big library: import topics and lessons from Wikipedia's Vital Articles (they come with categories).
+- [x] **Step 12:** Big library: import topics and lessons from Wikipedia's Vital Articles, browse by category.
 - [ ] **Step 13:** Quiz generator: make questions from the lesson text (spaCy, then a local LLM).
 - [ ] **Step 14:** Search any topic; a small classifier guesses the category of a new topic.
 - [ ] **Step 15:** Users: sign up and log in.

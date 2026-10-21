@@ -18,6 +18,7 @@ const CATEGORY_SPECIES = {
   arts: "flowerBush",
   society: "maple",
   mathematics: "topiary",
+  geography: "palm",
 };
 
 const SPECIES = {
@@ -30,6 +31,7 @@ const SPECIES = {
   flowerBush: { name: "Flower bush", dark: "#357f45", mid: "#4b9b57", light: "#7cc277", draw: drawFlowerBush },
   maple: { name: "Maple", dark: "#b2462a", mid: "#d06535", light: "#ee9b55", fruit: "#f6d36b", draw: drawRoundTree },
   topiary: { name: "Topiary", dark: "#257a52", mid: "#35986a", light: "#64c592", draw: drawTopiary },
+  palm: { name: "Palm tree", dark: "#2f7d3a", mid: "#46a04b", light: "#79c766", fruit: "#8a5a2b", draw: drawPalm },
 };
 
 // A thirsty garden (broken streak): every species turns dry and brown, without fruit
@@ -150,6 +152,39 @@ function drawTopiary(group, x, y, size, palette) {
   blob(group, x, y - 14 * size, 12 * size, palette);
   blob(group, x, y - 36 * size, 10 * size, palette);
   if (size >= 1) blob(group, x, y - 54 * size, 7.5 * size, palette);
+}
+
+function drawPalm(group, x, y, size, palette, full) {
+  // A trunk made of rings that leans a little to the right
+  const rings = 6;
+  const height = 48 * size;
+  for (let i = 0; i < rings; i++) {
+    const bottom = y - (height / rings) * i;
+    const top = bottom - height / rings - 1;
+    const lean = (i / rings) * 6 * size;
+    const w = 3.6 * size * (1 - i * 0.06);
+    shape("polygon", {
+      points: `${x + lean - w},${bottom} ${x + lean + 1.2 - w},${top} ${x + lean + 1.2 + w},${top} ${x + lean + w},${bottom}`,
+      fill: i % 2 ? TRUNK.light : TRUNK.dark,
+    }, group);
+  }
+  const topX = x + 7 * size;
+  const topY = y - height;
+  // Fronds: long leaves that bend down, the ones behind darker
+  const fronds = [[-1, 0.2, "dark"], [1, 0.25, "dark"], [-0.7, -0.35, "mid"], [0.75, -0.3, "mid"], [-0.2, -0.55, "light"], [0.25, 0.5, "mid"]];
+  for (const [dx, dy, tone] of fronds) {
+    const endX = topX + dx * 30 * size;
+    const endY = topY + 14 * size + dy * 10 * size;
+    const midX = topX + dx * 16 * size;
+    const midY = topY - 10 * size + dy * 6 * size;
+    shape("path", {
+      d: `M${topX},${topY} Q${midX},${midY - 6 * size} ${endX},${endY} Q${midX},${midY + 4 * size} ${topX},${topY + 3 * size} Z`,
+      fill: palette[tone],
+    }, group);
+  }
+  if (full && palette.fruit) {
+    for (const dx of [-3, 2, 6]) shape("circle", { cx: topX + dx * size, cy: topY + 5 * size, r: 3 * size, fill: palette.fruit }, group);
+  }
 }
 
 // ---------- public helpers ----------

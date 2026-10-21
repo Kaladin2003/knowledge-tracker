@@ -1,5 +1,6 @@
 // Topic page = one section of the field guide.
 // Reads the topic id from the URL, then loads the topic, its lessons and the index (for the section number).
+// The back link goes to the topic's category.
 
 async function loadTopicPage() {
   // topic.html?id=bikes  ->  "bikes"
@@ -24,10 +25,14 @@ async function loadTopicPage() {
       fetchJson(`/api/topics/${encodeURIComponent(topicId)}/lessons`),
       fetchJson("/api/topics"),
     ]);
-    const section = topics.findIndex((item) => item.id === topic.id) + 1;
+    const section = topics.find((item) => item.id === topic.id).section;
     const learned = lessons.filter((lesson) => lesson.completed).length;
 
     document.title = `${topic.title} · Knowledge Garden`;
+    if (topic.category_id) {
+      back.href = `category.html?id=${encodeURIComponent(topic.category_id)}`;
+      back.replaceChildren(icon("arrowLeft"), topic.category_title);
+    }
     document.getElementById("topic-swatch").replaceChildren(topicSwatch(topic.category_id));
     title.textContent = topic.title;
     description.textContent = topic.description;
@@ -68,6 +73,8 @@ function entryRow(lesson, section) {
   if (lesson.completed) {
     status.classList.add("learned");
     status.append(icon("check"), `Learned, ${lesson.best_score}/3`);
+  } else if (!lesson.has_quiz) {
+    status.textContent = "Read only"; // library entries get their self-test later
   } else {
     status.textContent = "Not yet";
   }

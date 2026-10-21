@@ -277,7 +277,7 @@ async function loadGarden() {
       fetchJson("/api/categories").catch(() => []),
     ]);
     renderKey(categories);
-    gardenSections = Object.fromEntries(topics.map((topic, index) => [topic.id, index + 1]));
+    gardenSections = Object.fromEntries(topics.map((topic) => [topic.id, topic.section]));
 
     // Thirsty: there are trees, but the streak is broken
     const thirsty = garden.trees.length > 0 && streak.current === 0;

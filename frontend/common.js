@@ -44,6 +44,26 @@ function entryNumber(sectionNumber, position) {
   return `${sectionNumber}.${position}`;
 }
 
+// "1/3", green when everything is learned (index and category page)
+function progressCount(done, total) {
+  const count = document.createElement("span");
+  count.className = "index-count";
+  count.textContent = `${done}/${total}`;
+  count.setAttribute("aria-label", `${done} of ${total} learned`);
+  count.classList.toggle("complete", total > 0 && done === total);
+  return count;
+}
+
+function meter(done, total) {
+  const bar = document.createElement("span");
+  bar.className = "meter";
+  bar.setAttribute("aria-hidden", "true");
+  const fill = document.createElement("span");
+  fill.style.width = total ? `${(done / total) * 100}%` : "0%";
+  bar.appendChild(fill);
+  return bar;
+}
+
 async function fetchJson(url) {
   const response = await fetch(url);
   if (!response.ok) {

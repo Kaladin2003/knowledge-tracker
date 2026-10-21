@@ -19,13 +19,12 @@ async function loadLessonPage() {
       fetchJson(`/api/lessons/${encodeURIComponent(lessonId)}`),
       fetchJson("/api/topics").catch(() => []),
     ]);
-    const sectionIndex = topics.findIndex((topic) => topic.id === lesson.topic_id);
-    const topic = topics[sectionIndex];
+    const topic = topics.find((item) => item.id === lesson.topic_id);
 
     document.title = `${lesson.title} · Knowledge Garden`;
     if (topic) {
-      document.getElementById("lesson-number").textContent = entryNumber(sectionIndex + 1, lesson.position);
-      back.replaceChildren(icon("arrowLeft"), `Section ${sectionIndex + 1}: ${topic.title}`);
+      document.getElementById("lesson-number").textContent = entryNumber(topic.section, lesson.position);
+      back.replaceChildren(icon("arrowLeft"), `Section ${topic.section}: ${topic.title}`);
     }
     back.href = `topic.html?id=${encodeURIComponent(lesson.topic_id)}`;
     title.textContent = lesson.title;
@@ -38,9 +37,12 @@ async function loadLessonPage() {
     if (lesson.completion) {
       status.classList.add("learned");
       status.append(icon("check"), `Learned, best ${lesson.completion.best_score}/3`);
-    } else {
+    } else if (lesson.has_quiz) {
       status.textContent = "Not learned yet";
+    } else {
+      status.textContent = "Read only for now";
     }
+    if (!lesson.has_quiz) showNoQuiz();
     const section = document.createElement("span");
     section.textContent = topic ? topic.title : "";
     meta.replaceChildren(...(topic ? [section] : []), minutes, status);
@@ -52,6 +54,13 @@ async function loadLessonPage() {
     title.textContent = "Could not load this lesson";
     meta.textContent = error.message;
   }
+}
+
+// Library lessons have no questions yet: say so instead of offering a self-test that can't load
+function showNoQuiz() {
+  document.getElementById("start-quiz").hidden = true;
+  document.querySelector(".quiz-intro p").textContent =
+    "This entry has no self-test yet. Library entries get their questions soon; for now, enjoy the read.";
 }
 
 function showBody(content) {

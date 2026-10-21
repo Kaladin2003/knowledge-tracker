@@ -33,6 +33,17 @@ Then open:
 - http://localhost:8000: the web page
 - http://localhost:8000/docs: interactive API docs (made by FastAPI)
 
+## Import the big library
+
+About 1,000 core articles from [Wikipedia's Vital Articles](https://en.wikipedia.org/wiki/Wikipedia:Vital_articles/Level/3), sorted into the app's categories:
+
+```bash
+python -m backend.vital_articles --dry-run   # show what would be imported
+python -m backend.vital_articles             # import into knowledge.db (safe to run again)
+```
+
+Imported lessons can be read right away; their self-tests come with the quiz generator.
+
 ## Run the tests
 
 ```bash
@@ -52,7 +63,9 @@ pytest -v
 | GET | `/api/lessons/{id}/quiz` | the lesson's quiz questions, without the answers |
 | POST | `/api/lessons/{id}/quiz` | body `{"answers": [1, 0, 2]}`; returns score, pass/fail and explanations; a pass is saved |
 | GET | `/api/progress` | finished lessons and totals |
-| GET | `/api/categories` | all categories, with how many topics each has |
+| GET | `/api/categories` | all categories, with topic, lesson and learned counts |
+| GET | `/api/topics?category=philosophy` | the topics of one category (each topic has its `section` number) |
+| GET | `/api/next` | the next lesson to learn (only lessons with a self-test), or `null` |
 | GET | `/api/garden` | one tree per finished lesson (why it was planted), plus the garden size |
 | GET | `/api/streak?tz=Europe/Athens` | daily streak (current, best, learned today) in the user's time zone |
 | DELETE | `/api/progress` | forget all progress and streak history (204) |
@@ -69,6 +82,7 @@ backend/
   schema.sql         # database tables
   seed_data.py       # starting topics, lessons and quiz questions
   wikipedia.py       # Wikipedia API client (with cache)
+  vital_articles.py  # imports the big library from Wikipedia's Vital Articles
   requirements.txt
 frontend/
   common.js          # shared by every page: icons, topic colours, fetchJson, top bar stats
@@ -76,6 +90,8 @@ frontend/
   app.js             # next entry, streak and index
   garden.js          # draws the isometric garden (SVG); click a tree to open its entry
   trees.js           # one tree species per category (pine, blossom, oak...) and topic swatches
+  category.html      # category page: the topics of one category
+  category.js        # loads one category and its topics
   topic.html         # topic page = one numbered section of the guide
   topic.js           # loads one topic and its entries
   lesson.html        # lesson page: text from Wikipedia, then the self-test
@@ -91,6 +107,7 @@ tests/
   test_streak.py     # streak logic, time zones, fake clock
   test_garden.py     # garden and caching
   test_wikipedia.py  # Wikipedia client tests (no real network calls)
+  test_vital_articles.py  # library importer tests (reads fixtures/vital_sample.wikitext)
 docs/steps/          # what each step taught me
 PRODUCT.md           # who the app is for and what it must do
 DESIGN.md            # the design system: colours, type, components, rules
