@@ -142,6 +142,63 @@ def list_topics(category: str | None = None, db: sqlite3.Connection = Depends(ge
     return topics
 
 
+MIN_SEARCH_LENGTH = 2
+
+
+def like_pattern(text: str) -> str:
+    """Turn what the user typed into a LIKE pattern: 'pla' -> '%pla%'.
+
+    % and _ are wildcards in LIKE, so if the user types them we escape them with a backslash.
+    """
+    escaped = text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{escaped}%"
+
+
+@app.get("/api/search")
+def search(q: str = "", limit: int = 8, db: sqlite3.Connection = Depends(get_db)):
+    """Find lessons and topics whose title contains the search text (not case-sensitive).
+
+    Titles that START with the text come first, then shorter titles, then A to Z.
+    """
+    q = q.strip()
+    if len(q) < MIN_SEARCH_LENGTH:
+        return {"lessons": [], "topics": []}
+    limit = max(1, min(limit, 20))  # never return a huge list
+    pattern, prefix = like_pattern(q), like_pattern(q)[1:]  # "%pla%" and "pla%"
+
+    # section = how many topics were added up to this one (the same number /api/topics gives)
+    section = "(SELECT COUNT(*) FROM topics t2 WHERE t2.rowid <= t.rowid)"
+    lessons = db.execute(
+        f"""
+        SELECT l.id, l.title, l.position, l.topic_id, t.title AS topic_title, t.category_id,
+               {section} AS section,
+               c.lesson_id IS NOT NULL AS completed
+        FROM lessons l
+        JOIN topics t ON t.id = l.topic_id
+        LEFT JOIN completions c ON c.lesson_id = l.id
+        WHERE l.title LIKE ? ESCAPE '\\'
+        ORDER BY l.title LIKE ? ESCAPE '\\' DESC, LENGTH(l.title), l.title
+        LIMIT ?
+        """,
+        (pattern, prefix, limit),
+    ).fetchall()
+    topics = db.execute(
+        f"""
+        SELECT t.id, t.title, t.category_id, {section} AS section,
+               (SELECT COUNT(*) FROM lessons l WHERE l.topic_id = t.id) AS lesson_count
+        FROM topics t
+        WHERE t.title LIKE ? ESCAPE '\\'
+        ORDER BY t.title LIKE ? ESCAPE '\\' DESC, LENGTH(t.title), t.title
+        LIMIT ?
+        """,
+        (pattern, prefix, limit),
+    ).fetchall()
+    return {
+        "lessons": [{**dict(row), "completed": bool(row["completed"])} for row in lessons],
+        "topics": [dict(row) for row in topics],
+    }
+
+
 @app.get("/api/next")
 def next_lesson(db: sqlite3.Connection = Depends(get_db)):
     """The next lesson to learn, or null when there is none.

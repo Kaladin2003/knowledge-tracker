@@ -4,6 +4,8 @@ The "client" and "db" arguments are fixtures from conftest.py:
 pytest creates them for each test, with a fresh test database.
 """
 
+import pytest
+
 import backend.main
 from backend.seed_data import QUIZZES
 from backend.wikipedia import ArticleNotFound, WikipediaError
@@ -269,3 +271,48 @@ def right_answers(lesson_id):
 
 def pass_bikes_frame(client):
     client.post("/api/lessons/bikes-frame/quiz", json={"answers": right_answers("bikes-frame")})
+
+
+# --- Search ---
+
+
+def test_search_finds_lessons_by_part_of_the_title(client):
+    lessons = client.get("/api/search?q=BRAKE").json()["lessons"]  # not case-sensitive
+
+    assert [lesson["id"] for lesson in lessons] == ["bikes-brakes"]
+    assert lessons[0]["topic_title"] == "Bikes"
+    assert lessons[0]["section"] == 1  # so the page can show "1.3"
+
+
+def test_search_finds_topics(client):
+    topics = client.get("/api/search?q=spa").json()["topics"]
+
+    assert [topic["id"] for topic in topics] == ["space"]
+    assert topics[0]["lesson_count"] == 3
+
+
+def test_search_puts_titles_that_start_with_the_text_first(client, db):
+    db.execute("INSERT INTO lessons VALUES ('x-1', 'bikes', 9, 'About the Moon', 3, 'Moon')")
+    db.execute("INSERT INTO lessons VALUES ('x-2', 'bikes', 10, 'Moon', 3, 'Moon')")
+    db.commit()
+
+    titles = [lesson["title"] for lesson in client.get("/api/search?q=moon").json()["lessons"]]
+
+    assert titles[0] == "Moon"  # starts with "moon", so it comes first
+    assert set(titles[1:]) == {"About the Moon", "Why the Moon has phases"}  # then shorter titles first
+    assert titles[1] == "About the Moon"
+
+
+@pytest.mark.parametrize("query", ["", "a", "  b  "])
+def test_search_needs_two_letters(client, query):
+    assert client.get("/api/search", params={"q": query}).json() == {"lessons": [], "topics": []}
+
+
+def test_search_wildcards_are_plain_text(client):
+    # % means "anything" in SQL LIKE: typing it must not match every lesson
+    assert client.get("/api/search", params={"q": "%%"}).json() == {"lessons": [], "topics": []}
+
+
+def test_search_limit(client):
+    lessons = client.get("/api/search?q=th&limit=2").json()["lessons"]
+    assert len(lessons) == 2

@@ -214,8 +214,111 @@ p {
   height: 28px;
 }
 
-.topbar-stats {
+/* Search box in the top bar; the results open under it like a small plate */
+.topbar-search {
+  position: relative;
+  flex: 1 1 260px;
+  max-width: 380px;
   margin-left: auto;
+}
+
+.topbar-search > .icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--cover-ink-2);
+  pointer-events: none;
+}
+
+#search-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 var(--s3) 0 38px;
+  border: 1px solid rgba(238, 245, 239, 0.28);
+  border-radius: var(--radius);
+  background: rgba(238, 245, 239, 0.1);
+  color: var(--cover-ink);
+  font: 400 0.95rem var(--font-ui);
+}
+
+#search-input::placeholder {
+  color: var(--cover-ink-2);
+}
+
+#search-input:focus {
+  outline: none;
+  background: var(--page);
+  border-color: var(--page);
+  color: var(--ink);
+}
+
+#search-input:focus::placeholder {
+  color: var(--ink-2);
+}
+
+.topbar-search:focus-within > .icon {
+  color: var(--ink-2);
+}
+
+.search-results {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: min(70vh, 460px);
+  overflow-y: auto;
+  padding: var(--s1);
+  background: var(--page);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.search-result {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s2) var(--s3);
+  border-radius: 4px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.search-result:hover,
+.search-result:focus-visible {
+  background: var(--ground);
+  color: var(--ink);
+  outline: none;
+}
+
+.search-title {
+  display: block;
+  font-weight: 600;
+}
+
+.search-title mark {
+  background: var(--selection);
+  color: inherit;
+  border-radius: 2px;
+}
+
+.search-meta {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--ink-2);
+}
+
+.search-empty {
+  padding: var(--s3);
+  color: var(--ink-2);
+}
+
+.topbar-stats {
   display: flex;
   gap: var(--s5);
   font-size: 0.95rem;
@@ -1030,6 +1133,21 @@ p {
 
   .topbar-stat .label {
     display: none;
+  }
+
+  .topbar-inner {
+    flex-wrap: wrap;
+  }
+
+  /* On a phone the search box gets its own full-width row under the wordmark */
+  .topbar-search {
+    order: 3;
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .topbar-stats {
+    margin-left: auto;
   }
 
   .page {

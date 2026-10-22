@@ -18,6 +18,14 @@
           </svg>
           Knowledge Garden
         </a>
+        <!-- search.js: results appear under the box as you type -->
+        <form id="search-form" class="topbar-search" role="search">
+          <label class="visually-hidden" for="search-input">Search lessons and topics</label>
+          <input id="search-input" type="search" placeholder="Search lessons and topics" autocomplete="off"
+                 aria-controls="search-results" aria-expanded="false" />
+          <div id="search-results" class="search-results" hidden></div>
+          <p id="search-status" class="visually-hidden" aria-live="polite"></p>
+        </form>
         <!-- common.js fills these two with the streak and the number of learned entries -->
         <div class="topbar-stats">
           <span id="topbar-streak" class="topbar-stat"></span>
@@ -68,6 +76,7 @@
 
     <script src="common.js"></script>
     <script src="trees.js"></script>
+    <script src="search.js"></script>
     <script src="app.js"></script>
     <script src="garden.js"></script>
   </body>

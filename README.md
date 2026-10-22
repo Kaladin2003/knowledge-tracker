@@ -67,6 +67,7 @@ pytest -v
 | GET | `/api/progress` | finished lessons and totals |
 | GET | `/api/categories` | all categories, with topic, lesson and learned counts |
 | GET | `/api/topics?category=philosophy` | the topics of one category (each topic has its `section` number) |
+| GET | `/api/search?q=plato` | lessons and topics whose title contains the text (at least 2 letters) |
 | GET | `/api/next` | the next lesson to learn (only lessons with a self-test), or `null` |
 | GET | `/api/garden` | one tree per finished lesson (why it was planted), plus the garden size |
 | GET | `/api/streak?tz=Europe/Athens` | daily streak (current, best, learned today) in the user's time zone |
@@ -99,6 +100,7 @@ frontend/
   lesson.html        # lesson page: text from Wikipedia, then the self-test
   lesson.js          # loads one lesson
   quiz.js            # self-test: load questions, send answers, show the grade
+  search.js          # the search box in the top bar: results as you type
   style.css          # the Field Guide design (tokens at the top)
   fonts/             # self-hosted Barlow Condensed and Source Serif 4 (OFL)
 tests/
