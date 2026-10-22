@@ -1,0 +1,25 @@
+# Runs the tests on GitHub every time you push (Step 2b).
+# See the result in the "Actions" tab of the repository.
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # a fresh Linux machine for every run
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]  # run the tests twice, once per Python version
+    steps:
+      - uses: actions/checkout@v4  # download the code of this commit
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip  # reuse downloaded packages, so runs are faster
+          cache-dependency-path: |
+            requirements-dev.txt
+            backend/requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Run the tests
+        run: python -m pytest -v

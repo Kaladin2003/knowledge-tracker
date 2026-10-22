@@ -6,7 +6,7 @@ One step = one commit (or a few small ones). Each step has notes in `docs/steps/
 
 - [x] **Step 1:** FastAPI backend with a topics API, and a web page that shows the topics.
 - [x] **Step 2:** Tests for the API with pytest.
-- [ ] **Step 2b (optional):** Run the tests on GitHub Actions (CI).
+- [x] **Step 2b:** Run the tests on GitHub Actions (CI) on every push.
 - [x] **Step 3:** Lessons: `GET /api/topics/{id}/lessons` and a topic page.
 - [x] **Step 4:** Lesson page with text from the Wikipedia API.
 - [x] **Step 5:** Quiz: our own questions per lesson, answers and score in the browser.

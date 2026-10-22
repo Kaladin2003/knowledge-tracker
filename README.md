@@ -1,5 +1,7 @@
 # Knowledge Garden
 
+[![Tests](https://github.com/Kaladin2003/knowledge-tracker/actions/workflows/tests.yml/badge.svg)](https://github.com/Kaladin2003/knowledge-tracker/actions/workflows/tests.yml)
+
 A daily learning app: pick a topic, read a short lesson, pass a quiz, keep your streak, and grow a **knowledge garden**: every finished lesson plants a tree.
 
 **Plan:** build it as a web app first (running on localhost), then turn it into a mobile app.
