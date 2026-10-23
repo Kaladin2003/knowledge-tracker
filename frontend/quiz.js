@@ -148,7 +148,7 @@ function showResults(fieldsets, grade, lessonId) {
   if (grade.saved) {
     const garden = document.createElement("a");
     garden.className = "button";
-    garden.href = "/";
+    garden.href = `/?planted=${encodeURIComponent(lessonId)}`; // the garden shows this tree growing
     garden.append("See your garden", icon("arrowRight"));
     actions.unshift(garden);
   }

@@ -18,6 +18,7 @@ One step = one commit (or a few small ones). Each step has notes in `docs/steps/
 - [x] **Step 11:** Categories and tree species: each category grows its own kind of tree.
 - [x] **Step 12:** Big library: import topics and lessons from Wikipedia's Vital Articles, browse by category.
 - [x] **Step 12b:** Search bar: find any lesson or topic as you type, on every page.
+- [x] **Step 12c:** A new tree grows in the garden (with sparks) right after you pass a self-test.
 - [ ] **Step 13:** Quiz generator: make questions from the lesson text (spaCy, then a local LLM).
 - [ ] **Step 14:** Add topics that are not in the library (from a Wikipedia search); a small classifier guesses their category.
 - [ ] **Step 15:** Users: sign up and log in.

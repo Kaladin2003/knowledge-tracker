@@ -142,14 +142,18 @@ function drawDecoration(svg, cell, size) {
 
 // One tree. Its species comes from the topic's category (trees.js).
 // 3/3 = fully grown with fruit or flowers, 2/3 = a young, smaller tree.
-function drawTree(svg, tree, cell, size, thirsty, onSelect) {
+// growing = this tree was just planted (or grew): play the grow animation once
+function drawTree(svg, tree, cell, size, thirsty, onSelect, growing = false) {
+  // People who turned on "reduce motion" in their system settings get the tree without the show
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) growing = false;
   const full = tree.best_score >= 3;
   const { sx, sy } = toScreen(cell.x, cell.y, size);
   const baseX = sx;
   const baseY = sy + TILE_H / 2 + 4; // a little in front of the tile centre
 
   const group = svgElement("g", {
-    class: "tree",
+    class: growing ? "tree growing" : "tree",
+    "data-lesson": tree.lesson_id,
     tabindex: "0",
     role: "button",
     "aria-label": `${tree.lesson_title}, ${tree.topic_title}. Open its entry.`,
@@ -160,6 +164,7 @@ function drawTree(svg, tree, cell, size, thirsty, onSelect) {
   svgElement("ellipse", { cx: baseX, cy: baseY, rx: 30, ry: 15, class: "tree-ring" }, group);
   svgElement("ellipse", { cx: baseX + 3, cy: baseY + 1, rx: 22, ry: 8, fill: "rgba(40, 70, 20, 0.28)" }, group);
   drawSpecies(group, tree.category_id, baseX, baseY, { size: full ? 1 : 0.72, full, thirsty });
+  if (growing) addSparks(group, baseX, baseY - (full ? 48 : 34));
 
   group.addEventListener("click", () => onSelect(tree, group));
   group.addEventListener("keydown", (event) => {
@@ -170,7 +175,7 @@ function drawTree(svg, tree, cell, size, thirsty, onSelect) {
   });
 }
 
-function renderGarden(garden, thirsty) {
+function renderGarden(garden, thirsty, plantedId = null) {
   const container = document.getElementById("garden");
   const size = garden.size;
   const width = size * TILE_W;
@@ -188,7 +193,7 @@ function renderGarden(garden, thirsty) {
   // Back to front (painter's order): each cell gets its tree, or a small decoration if it is empty
   plantingOrder(size).forEach((cell, index) => {
     const tree = garden.trees[index];
-    if (tree) drawTree(svg, tree, cell, size, thirsty, selectTree);
+    if (tree) drawTree(svg, tree, cell, size, thirsty, selectTree, tree.lesson_id === plantedId);
     else drawDecoration(svg, cell, size);
   });
 
@@ -264,6 +269,35 @@ function renderKey(categories) {
   );
 }
 
+// Small yellow dots that fly out of the crown while a tree grows.
+// Each one gets its own direction through CSS variables (--dx, --dy), used by the "spark" animation.
+function addSparks(group, x, y) {
+  const directions = [[-26, -14], [24, -18], [-14, -30], [16, -32], [-30, 4], [30, 2]];
+  for (const [dx, dy] of directions) {
+    const spark = svgElement("circle", { cx: x, cy: y, r: 3.5, class: "spark", style: `--dx: ${dx}px; --dy: ${dy}px` }, group);
+    spark.addEventListener("animationend", () => spark.remove()); // each spark cleans up after its own flight
+  }
+  // When the grow animation ends, remove the class, so hovering works normally again
+  group.addEventListener("animationend", (event) => {
+    if (event.target === group) group.classList.remove("growing"); // sparks' events bubble up here too
+  });
+}
+
+// After the grow animation starts: open the new tree's entry, and say what happened
+function showPlantedTree(garden, plantedId) {
+  // Take ?planted=... out of the address bar, so a reload doesn't replay the animation
+  window.history.replaceState(null, "", window.location.pathname);
+
+  const tree = garden.trees.find((item) => item.lesson_id === plantedId);
+  const group = document.querySelector(`.tree[data-lesson="${CSS.escape(plantedId)}"]`);
+  if (!tree || !group) return;
+
+  selectTree(tree, group);
+  const plantedToday = new Date(tree.planted_at).toDateString() === new Date().toDateString();
+  document.getElementById("garden-status").textContent =
+    `${plantedToday ? "Just planted" : "Just grew"}: ${tree.lesson_title}.`;
+}
+
 async function loadGarden() {
   const status = document.getElementById("garden-status");
   const info = document.getElementById("tree-info");
@@ -281,7 +315,9 @@ async function loadGarden() {
 
     // Thirsty: there are trees, but the streak is broken
     const thirsty = garden.trees.length > 0 && streak.current === 0;
-    renderGarden(garden, thirsty);
+    // Coming from a passed self-test? The quiz page links here with ?planted=<lesson id>
+    const plantedId = new URLSearchParams(window.location.search).get("planted");
+    renderGarden(garden, thirsty, plantedId);
 
     const count = garden.trees.length;
     status.classList.toggle("thirsty", thirsty);
@@ -292,6 +328,7 @@ async function loadGarden() {
     } else {
       status.textContent = `${count} ${count === 1 ? "tree" : "trees"}. Select one to read its entry.`;
     }
+    if (plantedId) showPlantedTree(garden, plantedId);
   } catch (error) {
     status.textContent = `Could not load the garden: ${error.message}`;
   }
